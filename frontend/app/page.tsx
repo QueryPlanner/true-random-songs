@@ -163,8 +163,8 @@ export default function Home() {
                 </p>
                 
                 {/* Simplified Controls */}
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
-                    <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
+                    <div className="flex flex-col gap-2 shrink-0">
                         <div className="join border-2 border-primary-content/10">
                             <button 
                                 onClick={() => setMode("random")}
@@ -179,14 +179,11 @@ export default function Home() {
                                 🔥 Somewhat popular random
                             </button>
                         </div>
-                        <div className="text-right px-1">
-                          <button className="link link-primary text-xs">read more in blog</button>
-                        </div>
                     </div>
 
                     <button
                         onClick={fetchTracks}
-                        className={`btn btn-warning btn-lg px-8 ${loading ? "btn-disabled" : ""}`}
+                        className={`btn btn-warning btn-lg px-8 shrink-0 ${loading ? "btn-disabled" : ""}`}
                     >
                         {loading ? (
                             <span className="loading loading-spinner"></span>
