@@ -418,7 +418,7 @@ export default function DataExploration() {
                       color: "var(--foreground)",
                     }}
                     itemStyle={{ color: "var(--foreground)" }}
-                    formatter={(value: any, name: any) => [formatPercent(Number(value)), name === "major_pct" ? "Major" : "Minor"]}
+                    formatter={(value: any, name: any) => [formatPercent(Number(value)), String(name)]}
                     labelFormatter={(label) => `Key: ${label}`}
                   />
                   <Bar dataKey="minor_pct" stackId="mode" name="Minor" fill="#BFDBFE" radius={[0, 0, 0, 0]} />
