@@ -168,7 +168,7 @@ export default function DataExploration() {
                     contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
                     itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
                   />
-                  <Line type="monotone" dataKey="avg_duration_sec" stroke="#1DB954" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -190,7 +190,7 @@ export default function DataExploration() {
                     contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
                     itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
                   />
-                  <Area type="monotone" dataKey="explicit_pct" stroke="#1DB954" fill="#1DB954" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="explicit_pct" stroke="var(--secondary)" fill="var(--secondary)" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -212,7 +212,7 @@ export default function DataExploration() {
                     contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
                     itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
                   />
-                  <Bar dataKey="avg_popularity" fill="#1DB954" radius={[0, 4, 4, 0]} name="Avg Popularity" />
+                  <Bar dataKey="avg_popularity" fill="var(--accent)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

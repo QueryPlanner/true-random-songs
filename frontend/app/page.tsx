@@ -87,7 +87,7 @@ export default function Home() {
     <div className="min-h-screen bg-base-300 text-base-content flex flex-col">
       
       {/* Navbar */}
-      <div className="navbar bg-neutral text-neutral-content shadow-lg z-50 fixed top-0 w-full px-4">
+      <div className="navbar bg-primary text-primary-content shadow-lg z-50 fixed top-0 w-full px-4">
         <div className="navbar-start">
           <button className="btn btn-ghost text-xl">True Random Spotify</button>
         </div>
