@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 // --- Types ---
@@ -22,7 +22,7 @@ export default function Home() {
 
   // --- State ---
   const [mode, setMode] = useState<"random" | "popular">("random");
-  const [count, setCount] = useState(20);
+  const [count, setCount] = useState(15);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -43,120 +43,123 @@ export default function Home() {
     }
   };
 
+  // --- Effects ---
+  useEffect(() => {
+    fetchTracks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
+  // --- Render Helpers ---
+  const renderPlaylistContent = () => {
+    if (tracks.length === 0 && !loading) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center opacity-50 p-8">
+          <div className="text-6xl mb-4">🎵</div>
+          <p className="text-lg font-bold">No playlist yet</p>
+          <p className="text-sm mt-2 opacity-70">Configure settings and click Generate</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-full overflow-y-auto custom-scrollbar bg-base-100">
+        <div className="p-2 space-y-2">
+          {tracks.map((track, i) => (
+            <div key={i} className="bg-black rounded-xl overflow-hidden shadow-sm">
+              <iframe
+                title={`Spotify preview: ${track.name}`}
+                style={spotifyEmbedIframeStyle}
+                src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
+                width="100%"
+                height="80" // Compact height for mockups
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+              ></iframe>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // --- Render ---
   return (
-    <div className="min-h-screen bg-base-300 text-base-content font-sans p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-4xl font-bold text-accent">True Random Spotify</h1>
-            <div className="badge badge-accent badge-outline">v3.0</div>
-          </div>
-          <div className="badge badge-success p-3">🎵 Playlist Mode</div>
+    <div className="min-h-screen bg-base-300 text-base-content font-sans flex flex-col">
+      
+      {/* Navbar */}
+      <div className="navbar bg-neutral text-neutral-content shadow-lg z-50 fixed top-0 w-full">
+        <div className="flex-1">
+          <button className="btn btn-ghost text-xl">True Random Spotify</button>
         </div>
+        <div className="flex-none">
+          <div className="badge badge-accent badge-outline mr-2">v3.0</div>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-            {/* Configuration Column */}
-            <div className="lg:col-span-1 space-y-6">
-                {/* Controls */}
-                <div className="card bg-base-100 shadow-xl">
-                  <div className="card-body space-y-4">
-                    <h2 className="card-title text-accent text-lg">Config</h2>
-
+      {/* Hero Section */}
+      <div className="hero bg-base-200 pt-24 pb-12">
+        <div className="hero-content flex-col w-full max-w-7xl">
+            {/* Text Content */}
+            <div className="text-center max-w-2xl mb-8">
+                <h1 className="text-5xl font-bold">Discover New Music</h1>
+                <p className="py-6">
+                    Break out of your echo chamber. Generate truly random playlists from a massive database of songs.
+                </p>
+                
+                {/* Simplified Controls */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300">
                     <div className="form-control">
-                      <label className="label cursor-pointer flex-col items-start gap-2">
-                        <span className="label-text font-bold">Mode</span>
-                        <input
-                          type="checkbox"
-                          className="toggle toggle-accent"
-                          checked={mode === "popular"}
-                          onChange={(e) => setMode(e.target.checked ? "popular" : "random")}
-                        />
-                      </label>
-                      <div className="text-xs opacity-60 mt-1">
-                        {mode === "random" ? "🎲 Random" : "🔥 Popular"}
-                      </div>
+                        <label className="label cursor-pointer gap-4">
+                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 Random" : "🔥 Popular"}</span>
+                            <input
+                                type="checkbox"
+                                className="toggle toggle-accent toggle-lg"
+                                checked={mode === "popular"}
+                                onChange={(e) => setMode(e.target.checked ? "popular" : "random")}
+                            />
+                        </label>
                     </div>
 
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-bold">Count</span>
-                      </label>
-                      <input
-                        type="range"
-                        min="5"
-                        max="50"
-                        value={count}
-                        onChange={(e) => setCount(parseInt(e.target.value))}
-                        className="range range-accent range-sm"
-                      />
-                      <div className="text-center text-2xl font-bold text-accent mt-2">{count}</div>
-                    </div>
-
-                    <div className="card-actions justify-end mt-4">
-                      <button
+                    <button
                         onClick={fetchTracks}
-                        className={`btn btn-accent w-full ${loading ? "btn-disabled" : ""}`}
-                      >
-                        {loading && <span className="loading loading-spinner"></span>}
-                        {loading ? "Loading..." : "Generate"}
-                      </button>
-                    </div>
-                  </div>
+                        className={`btn btn-accent btn-lg px-8 ${loading ? "btn-disabled" : ""}`}
+                    >
+                        {loading ? (
+                            <span className="loading loading-spinner"></span>
+                        ) : (
+                            <span className="text-2xl mr-2">🎲</span>
+                        )}
+                        {loading ? "Generating..." : "Generate"}
+                    </button>
                 </div>
             </div>
 
-            {/* Playlist Column */}
-            <div className="lg:col-span-3">
-                {tracks.length > 0 ? (
-                  <div className="card bg-base-100 shadow-2xl">
-                    <div className="card-body p-0">
-                      {/* Playlist Header */}
-                      <div className="bg-primary text-primary-content p-6">
-                        <div className="flex items-center gap-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                          </svg>
-                          <div>
-                            <h2 className="text-2xl font-bold">
-                              Random Playlist {mode === "random" ? "🎲" : "🔥"}
-                            </h2>
-                            <p className="text-sm opacity-80">{tracks.length} tracks generated</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Playlist Tracks */}
-                      <div className="h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar">
-                        {tracks.map((track, i) => (
-                          <div key={i} className="border-b border-base-300 last:border-b-0">
-                            <div className="bg-black rounded-2xl overflow-hidden">
-                              <iframe
-                                title={`Spotify preview: ${track.name}`}
-                                style={spotifyEmbedIframeStyle}
-                                src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
-                                width="100%"
-                                height="152"
-                                allowFullScreen
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                loading="lazy"
-                              ></iframe>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+            {/* Playlist Display */}
+            <div className="w-full flex justify-center items-start">
+                {/* Desktop: Mockup Browser */}
+                <div className="hidden md:block w-full max-w-4xl h-[600px]">
+                  <div className="mockup-browser border border-base-300 bg-base-200 w-full h-full flex flex-col shadow-2xl">
+                    <div className="mockup-browser-toolbar">
+                      <div className="input">https://true-random-spotify.com</div>
+                    </div>
+                    <div className="flex-grow overflow-hidden relative bg-base-100">
+                        {renderPlaylistContent()}
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center opacity-50 border-2 border-dashed border-base-content/20 rounded-xl bg-base-100">
-                    <div className="text-6xl mb-4">🎵</div>
-                    <p className="text-lg font-bold">No playlist yet</p>
-                    <p className="text-sm mt-2 opacity-70">Configure settings and click Generate</p>
-                  </div>
-                )}
+                </div>
+
+                {/* Mobile: Mockup Phone */}
+                <div className="md:hidden block w-full flex justify-center">
+                   <div className="mockup-phone border-primary">
+                      <div className="mockup-phone-camera"></div> 
+                      <div className="mockup-phone-display">
+                        <div className="artboard artboard-demo phone-1 bg-base-100 overflow-hidden relative block">
+                            {renderPlaylistContent()}
+                        </div>
+                      </div>
+                    </div>
+                </div>
             </div>
         </div>
       </div>
