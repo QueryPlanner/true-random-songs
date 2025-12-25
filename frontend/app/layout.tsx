@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Rock_3D } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const rock3d = Rock_3D({
+  variable: "--font-rock-3d",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="icecream">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${rock3d.variable} antialiased font-[family-name:var(--font-rock-3d)]`}
       >
         {children}
       </body>
