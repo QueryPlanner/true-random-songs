@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import DotGrid from "@/components/DotGrid";
+import DataExploration from "@/components/DataExploration";
 
 // --- Types ---
 interface Track {
@@ -91,8 +92,9 @@ export default function Home() {
           <button className="btn btn-ghost text-xl">True Random Spotify</button>
         </div>
         
-        <div className="navbar-center">
+        <div className="navbar-center flex gap-2">
           <button className="btn btn-ghost">Blog</button>
+          <a href="#exploration" className="btn btn-ghost">Data Exploration</a>
         </div>
 
         <div className="navbar-end">
@@ -197,6 +199,10 @@ export default function Home() {
             </div>
         </div>
       </div>
+      
+      {/* Data Exploration Section */}
+      <DataExploration />
+
     </div>
   );
 }
