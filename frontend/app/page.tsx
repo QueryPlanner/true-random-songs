@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import PixelSnow from "./components/PixelSnow";
+import DotGrid from "@/components/DotGrid";
 
 // --- Types ---
 interface Track {
@@ -118,9 +118,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="hero bg-base-200 pt-24 pb-12 relative overflow-hidden">
-        <PixelSnow color="#ffc0cb" className="pointer-events-none" />
+      {/* Hero Section (offset for fixed navbar) */}
+      <div className="hero bg-base-200 pt-16 pb-12 relative overflow-hidden">
+        <div className="absolute inset-0 w-full h-full z-0">
+          <DotGrid
+            dotSize={10}
+            gap={15}
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
+        </div>
         <div className="hero-content flex-col w-full max-w-7xl relative z-10">
             {/* Text Content */}
             <div className="text-center max-w-2xl mb-8">
