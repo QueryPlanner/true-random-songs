@@ -33,7 +33,8 @@ export default function Home() {
     setLoading(true);
     try {
       // Use the correct endpoint /random and parameter limit
-      const response = await axios.get(`http://localhost:8000/random?mode=${mode}&limit=${count}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await axios.get(`${apiUrl}/random?mode=${mode}&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
       console.error("Error fetching tracks:", error);
