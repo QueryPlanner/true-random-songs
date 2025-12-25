@@ -118,7 +118,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section (offset for fixed navbar) */}
-      <div className="hero bg-base-200 pt-16 pb-12 relative overflow-hidden">
+      <div className="hero bg-base-200 min-h-screen relative overflow-hidden pt-16">
         <div className="absolute inset-0 w-full h-full z-0">
           <DotGrid
             dotSize={10}
@@ -130,7 +130,7 @@ export default function Home() {
             returnDuration={1.5}
           />
         </div>
-        <div className="hero-content flex-col lg:flex-row w-full max-w-7xl relative z-10 gap-12">
+        <div className="hero-content flex-col lg:flex-row w-full max-w-[1400px] relative z-10 gap-12">
             {/* Text Content */}
             <div className="text-center lg:text-left lg:w-1/2 max-w-2xl mx-auto lg:mx-0 mb-8 lg:mb-0">
                 <h1 className="text-5xl font-bold">Discover New Music</h1>
