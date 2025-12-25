@@ -111,7 +111,7 @@ export default function Home() {
               <li><a href="#exploration">Data Exploration</a></li>
             </ul>
           </div>
-          <button className="btn btn-ghost text-xl">True Random Spotify</button>
+          <button className="btn btn-ghost border-2 border-primary-content/20 text-xl">True Random Spotify</button>
         </div>
         
         <div className="navbar-center hidden lg:flex gap-2">
@@ -164,16 +164,21 @@ export default function Home() {
                 
                 {/* Simplified Controls */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
-                    <div className="form-control">
-                        <label className="label cursor-pointer gap-4 pb-0">
-                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Somewhat popular random"}</span>
-                            <input
-                                type="checkbox"
-                                className="toggle toggle-accent toggle-lg"
-                                checked={mode === "popular"}
-                                onChange={(e) => setMode(e.target.checked ? "popular" : "random")}
-                            />
-                        </label>
+                    <div className="flex flex-col gap-2">
+                        <div className="join border-2 border-primary-content/10">
+                            <button 
+                                onClick={() => setMode("random")}
+                                className={`join-item btn btn-md ${mode === "random" ? "btn-primary" : "btn-ghost"}`}
+                            >
+                                🎲 True Random
+                            </button>
+                            <button 
+                                onClick={() => setMode("popular")}
+                                className={`join-item btn btn-md ${mode === "popular" ? "btn-primary" : "btn-ghost"}`}
+                            >
+                                🔥 Somewhat popular random
+                            </button>
+                        </div>
                         {mode === "popular" && (
                           <div className="text-left px-1">
                             <button className="link link-primary text-xs">read more in blog</button>
