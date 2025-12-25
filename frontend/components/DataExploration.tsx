@@ -212,7 +212,7 @@ export default function DataExploration() {
                     contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
                     itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
                   />
-                  <Bar dataKey="avg_popularity" fill="var(--accent)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
+                  <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

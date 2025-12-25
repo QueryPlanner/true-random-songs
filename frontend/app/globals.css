@@ -24,8 +24,8 @@
   --color-info-content: oklch(35% 0.08 220);
   --color-success: oklch(88% 0.16 145);
   --color-success-content: oklch(35% 0.08 145);
-  --color-warning: oklch(90% 0.18 85);
-  --color-warning-content: oklch(45% 0.12 45);
+  --color-warning: oklch(92% 0.18 90);
+  --color-warning-content: oklch(45% 0.15 90);
   --color-error: oklch(70% 0.2 25);
   --color-error-content: oklch(98% 0.01 25);
   --radius-selector: 1.5rem;
@@ -135,7 +135,7 @@ iframe[src*="open.spotify.com/embed"] {
   --chart-1: oklch(75% 0.18 15);
   --chart-2: oklch(88% 0.15 160);
   --chart-3: oklch(85% 0.14 200);
-  --chart-4: oklch(90% 0.18 85);
+  --chart-4: oklch(92% 0.18 90);
   --chart-5: oklch(85% 0.12 220);
   --sidebar: oklch(98.39% 0.009 81.33);
   --sidebar-foreground: oklch(40% 0.15 15);

@@ -161,7 +161,7 @@ export default function Home() {
 
                     <button
                         onClick={fetchTracks}
-                        className={`btn btn-accent btn-lg px-8 ${loading ? "btn-disabled" : ""}`}
+                        className={`btn btn-warning btn-lg px-8 ${loading ? "btn-disabled" : ""}`}
                     >
                         {loading ? (
                             <span className="loading loading-spinner"></span>
