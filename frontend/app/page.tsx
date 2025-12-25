@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import PixelSnow from "./components/PixelSnow";
 
 // --- Types ---
 interface Track {
@@ -118,8 +119,9 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <div className="hero bg-base-200 pt-24 pb-12">
-        <div className="hero-content flex-col w-full max-w-7xl">
+      <div className="hero bg-base-200 pt-24 pb-12 relative overflow-hidden">
+        <PixelSnow color="#ffc0cb" className="pointer-events-none" />
+        <div className="hero-content flex-col w-full max-w-7xl relative z-10">
             {/* Text Content */}
             <div className="text-center max-w-2xl mb-8">
                 <h1 className="text-5xl font-bold">Discover New Music</h1>
