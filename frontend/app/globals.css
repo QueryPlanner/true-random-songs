@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "bumblebee";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97% 0 0);
+  --color-base-300: oklch(92% 0 0);
+  --color-base-content: oklch(20% 0 0);
+  --color-primary: oklch(85% 0.199 91.936);
+  --color-primary-content: oklch(42% 0.095 57.708);
+  --color-secondary: oklch(75% 0.183 55.934);
+  --color-secondary-content: oklch(40% 0.123 38.172);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(37% 0.01 67.558);
+  --color-neutral-content: oklch(92% 0.003 48.717);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(39% 0.09 240.876);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(70% 0.191 22.216);
+  --color-error-content: oklch(39% 0.141 25.723);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/*
+  Spotify embeds render rounded cards inside a transparent <iframe>.
+  We make the iframe + its immediate surface black + square so the corners
+  visually appear rectangular.
+*/
+iframe[src*="open.spotify.com/embed"] {
+  border-radius: var(--radius-box) !important;
+  background: #000 !important;
+}
