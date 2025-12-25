@@ -187,10 +187,10 @@ iframe[src*="open.spotify.com/embed"] {
   }
   body {
     @apply bg-background text-foreground;
-    /*
-      Slightly increase letter spacing for better readability with display fonts
-      like "Bangers". If you want more/less, tweak the tracking utility here.
-    */
+    font-family: var(--font-annie), cursive;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-bangers), system-ui;
     @apply tracking-wider;
   }
 }

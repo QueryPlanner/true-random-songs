@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Bangers } from "next/font/google";
+import { Bangers, Annie_Use_Your_Telescope } from "next/font/google";
 import "./globals.css";
 
-const bangersFont = Bangers({
+const bangers = Bangers({
   subsets: ["latin"],
   weight: "400",
+  variable: "--font-bangers",
+});
+
+const annie = Annie_Use_Your_Telescope({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-annie",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="icecream">
-      <body className={`${bangersFont.className} antialiased`}>
+      <body className={`${bangers.variable} ${annie.variable} antialiased`}>
         {children}
       </body>
     </html>
