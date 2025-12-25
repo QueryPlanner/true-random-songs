@@ -161,12 +161,12 @@ export default function DataExploration() {
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={SONG_DURATION_TREND}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'currentColor'}} />
-                  <YAxis fontSize={12} tick={{fill: 'currentColor'}} unit="s" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
+                  <YAxis fontSize={12} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="s" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
                   />
                   <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
@@ -183,12 +183,12 @@ export default function DataExploration() {
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={EXPLICIT_CONTENT_TREND}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'currentColor'}} />
-                  <YAxis fontSize={12} tick={{fill: 'currentColor'}} unit="%" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
+                  <YAxis fontSize={12} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="%" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
                   />
                   <Area type="monotone" dataKey="explicit_pct" stroke="var(--secondary)" fill="var(--secondary)" fillOpacity={0.3} />
                 </AreaChart>
@@ -205,12 +205,12 @@ export default function DataExploration() {
             <div className="h-[500px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={TOP_GENRES_DATA} layout="vertical" margin={{ left: 60, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.3} />
-                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'currentColor'}} />
-                  <YAxis dataKey="genre" type="category" fontSize={12} width={120} tick={{fill: 'currentColor'}} />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.5} />
+                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
+                  <YAxis dataKey="genre" type="category" fontSize={12} width={120} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
                   />
                   <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
                 </BarChart>
