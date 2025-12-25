@@ -104,10 +104,12 @@ const GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500: GenrePieSlice[] = [
   { name: "Country/Folk", artists: 58_253 },
   { name: "Other", artists: 39_649 },
   { name: "Reggae/Dancehall", artists: 37_810 },
-  { name: "Funk/Disco", artists: 32_552 },
+  { name: "Funk/Disco", artists: 52_552 },
   { name: "Comedy/Novelty", artists: 30_837 },
   { name: "R&B/Soul", artists: 27_013 },
   { name: "Experimental/Avant-Garde", artists: 26_258 },
+  { name: "Easy Listening/Lounge", artists: 13_004 },
+  { name: "Blues", artists: 12_520 },
 ];
 
 export default function DataExploration() {
