@@ -1,18 +1,5 @@
 import type { Metadata } from "next";
-import { Bangers, Annie_Use_Your_Telescope } from "next/font/google";
 import "./globals.css";
-
-const bangers = Bangers({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-bangers",
-});
-
-const annie = Annie_Use_Your_Telescope({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-annie",
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,7 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="icecream">
-      <body className={`${bangers.variable} ${annie.variable} antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Capriola&display=swap" rel="stylesheet" />
+      </head>
+      <body className="antialiased">
         {children}
       </body>
     </html>

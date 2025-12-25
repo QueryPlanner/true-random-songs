@@ -187,10 +187,16 @@ iframe[src*="open.spotify.com/embed"] {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-annie), cursive;
+    font-family: "Capriola", sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-bangers), system-ui;
+    font-family: "Capriola", sans-serif;
     @apply tracking-wider;
   }
+}
+
+.capriola-regular {
+  font-family: "Capriola", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
