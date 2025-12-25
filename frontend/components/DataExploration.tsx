@@ -13,6 +13,10 @@ import {
   Area,
   LineChart,
   Line,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
 
 // --- Data ---
@@ -53,6 +57,13 @@ const SONG_DURATION_TREND = [
   { year: "2024", avg_duration_sec: 193.83 }
 ];
 
+const SECONDS_PER_MINUTE = 60;
+
+const SONG_DURATION_TREND_MINUTES = SONG_DURATION_TREND.map(({ year, avg_duration_sec }) => ({
+  year,
+  avg_duration_min: avg_duration_sec / SECONDS_PER_MINUTE,
+}));
+
 // Sampled from 2000 onwards for clarity in the modern era
 const EXPLICIT_CONTENT_TREND = [
   { year: "2000", explicit_pct: 2.45 }, { year: "2001", explicit_pct: 2.94 },
@@ -70,22 +81,33 @@ const EXPLICIT_CONTENT_TREND = [
   { year: "2024", explicit_pct: 17.84 }
 ];
 
-const TOP_GENRES_DATA = [
-  { genre: "sad sierreño", avg_popularity: 23.53, track_count: 25315 },
-  { genre: "trap", avg_popularity: 23.15, track_count: 65298 },
-  { genre: "trap latino", avg_popularity: 21.66, track_count: 44919 },
-  { genre: "trap funk", avg_popularity: 21.51, track_count: 49423 },
-  { genre: "electro corridos", avg_popularity: 21.17, track_count: 24776 },
-  { genre: "rap", avg_popularity: 21.14, track_count: 42569 },
-  { genre: "k-pop", avg_popularity: 21.01, track_count: 57687 },
-  { genre: "urbano latino", avg_popularity: 20.92, track_count: 41247 },
-  { genre: "corridos tumbados", avg_popularity: 20.45, track_count: 44186 },
-  { genre: "agronejo", avg_popularity: 19.46, track_count: 37049 },
-  { genre: "reggaeton", avg_popularity: 19.37, track_count: 89118 },
-  { genre: "pop urbaine", avg_popularity: 19.23, track_count: 65088 },
-  { genre: "latin pop", avg_popularity: 19.1, track_count: 56629 },
-  { genre: "latin", avg_popularity: 19.0, track_count: 36242 },
-  { genre: "argentine trap", avg_popularity: 18.37, track_count: 32801 }
+type GenrePieSlice = {
+  name: string;
+  artists: number;
+};
+
+// Values taken from the "Genre Hierarchy (Artists > 500)" image in the referenced blog post.
+// We keep the visible top-level buckets explicit and roll everything else into a single "Others" slice.
+const GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500: GenrePieSlice[] = [
+  { name: "Electronic/Dance", artists: 520_075 },
+  { name: "Rock", artists: 370_179 },
+  { name: "World/Traditional", artists: 202_529 },
+  { name: "Latin", artists: 189_438 },
+  { name: "Hip Hop/Rap", artists: 166_516 },
+  { name: "Pop", artists: 151_135 },
+  { name: "Classical", artists: 106_573 },
+  { name: "Jazz", artists: 72_173 },
+
+  // Smaller labeled top-level buckets from the image (kept for computing "Others"):
+  { name: "Regional/National", artists: 63_518 },
+  { name: "Gospel/Christian", artists: 62_318 },
+  { name: "Country/Folk", artists: 58_253 },
+  { name: "Other", artists: 39_649 },
+  { name: "Reggae/Dancehall", artists: 37_810 },
+  { name: "Funk/Disco", artists: 32_552 },
+  { name: "Comedy/Novelty", artists: 30_837 },
+  { name: "R&B/Soul", artists: 27_013 },
+  { name: "Experimental/Avant-Garde", artists: 26_258 },
 ];
 
 export default function DataExploration() {
@@ -93,16 +115,123 @@ export default function DataExploration() {
     return new Intl.NumberFormat("en-US", { notation: "compact", compactDisplay: "short" }).format(num);
   };
 
-  const POPULARITY_DEFINITION = (
+  const formatInteger = (num: number) => {
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(num);
+  };
+
+  const formatPercent = (value: number) => {
+    return `${value.toFixed(1)}%`;
+  };
+
+  const formatMinutes = (value: number) => {
+    return `${value.toFixed(1)} min`;
+  };
+
+  const KAGGLE_CLEANED_DATASET_URL = "https://www.kaggle.com/datasets/lordpatil/spotify-metadata-by-annas-archive";
+
+  const INFO_BLOCK = (
     <div role="alert" className="alert alert-info alert-soft">
-      <div className="space-y-1">
-        <div className="font-semibold text-base-content">What does “popularity” mean?</div>
-        <div className="text-sm text-base-content/80">
+      <div className="space-y-2 text-sm text-base-content/80">
+        <div>
           Popularity is Spotify’s 0–100 score that reflects how much a track or artist is being listened to right now (higher means more currently popular).
+        </div>
+        <div>
+          The raw data was downloaded from the Anna’s Archive release of Spotify metadata. A cleaned version (used for this app) is published on{" "}
+          <a className="link link-primary" href={KAGGLE_CLEANED_DATASET_URL} target="_blank" rel="noopener noreferrer">
+            Kaggle
+          </a>
+          .
         </div>
       </div>
     </div>
   );
+
+  const GENRE_PIE_MAJOR_CATEGORIES = [
+    "Electronic/Dance",
+    "Rock",
+    "World/Traditional",
+    "Latin",
+    "Hip Hop/Rap",
+    "Pop",
+    "Classical",
+    "Jazz",
+  ] as const;
+
+  const buildGenrePieData = (): GenrePieSlice[] => {
+    const majorSlices = GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500.filter((slice) => GENRE_PIE_MAJOR_CATEGORIES.includes(slice.name as any));
+    const majorNames = new Set(majorSlices.map((s) => s.name));
+
+    const otherCount = GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500
+      .filter((slice) => !majorNames.has(slice.name))
+      .reduce((sum, slice) => sum + slice.artists, 0);
+
+    const hasOthers = otherCount > 0;
+    const othersSlice: GenrePieSlice | null = hasOthers ? { name: "Others", artists: otherCount } : null;
+
+    const slices = [...majorSlices, ...(othersSlice ? [othersSlice] : [])];
+    return slices;
+  };
+
+  const GENRE_PIE_DATA = buildGenrePieData();
+
+  const PIE_COLORS = [
+    // Ice-cream-shop inspired palette (pastel, high-contrast, theme-friendly)
+    "#FFB3C1", // strawberry
+    "#A7F3D0", // mint
+    "#FDE68A", // vanilla
+    "#BFDBFE", // blueberry
+    "#FBCFE8", // bubblegum
+    "#FDBA74", // mango sorbet
+    "#C7D2FE", // ube
+    "#BBF7D0", // pistachio
+    "#E5E7EB", // others (neutral)
+  ];
+
+  const TOTAL_ARTISTS_IN_PIE = GENRE_PIE_DATA.reduce((sum, slice) => sum + slice.artists, 0);
+
+  const RADIAN = Math.PI / 180;
+  const renderGenrePieLabel = (labelProps: any) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = labelProps;
+
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    const percentage = (Number(value) / TOTAL_ARTISTS_IN_PIE) * 100;
+    const labelText = `${name} (${formatPercent(percentage)})`;
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="var(--base-content)"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+        fontSize={11}
+        fontWeight={700}
+        stroke="color-mix(in oklab, var(--base-100) 85%, transparent)"
+        strokeWidth={3}
+        paintOrder="stroke"
+      >
+        {labelText}
+      </text>
+    );
+  };
+
+  const MODE_DISTRIBUTION_BY_KEY = [
+    { key: "C", major_pct: 9.3, minor_pct: 2.8 },
+    { key: "C#/Db", major_pct: 7.9, minor_pct: 2.8 },
+    { key: "D", major_pct: 7.5, minor_pct: 2.4 },
+    { key: "D#/Eb", major_pct: 2.1, minor_pct: 1.3 },
+    { key: "E", major_pct: 3.0, minor_pct: 4.0 },
+    { key: "F", major_pct: 4.6, minor_pct: 3.8 },
+    { key: "F#/Gb", major_pct: 3.2, minor_pct: 3.2 },
+    { key: "G", major_pct: 8.3, minor_pct: 2.8 },
+    { key: "G#/Ab", major_pct: 4.5, minor_pct: 1.9 },
+    { key: "A", major_pct: 5.1, minor_pct: 4.6 },
+    { key: "A#/Bb", major_pct: 3.3, minor_pct: 3.8 },
+    { key: "B", major_pct: 3.1, minor_pct: 4.6 },
+  ];
 
   return (
     <div id="exploration" className="w-full max-w-7xl mx-auto p-4 md:p-8 space-y-12 bg-base-200 rounded-3xl my-12">
@@ -110,7 +239,7 @@ export default function DataExploration() {
       <div className="text-center space-y-4">
         <h2 className="text-5xl font-bold text-primary">Data Exploration</h2>
         <p className="text-xl opacity-80 max-w-2xl mx-auto">
-          Deep dive into the Spotify ecosystem. Analysis based on the cleaned dataset of 256M+ tracks.
+          Deep dive into the Spotify ecosystem. Analysis based on a cleaned dataset of 256M+ tracks.
         </p>
       </div>
 
@@ -137,7 +266,7 @@ export default function DataExploration() {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         
-        <div className="xl:col-span-2">{POPULARITY_DEFINITION}</div>
+        <div className="xl:col-span-2">{INFO_BLOCK}</div>
 
         {/* Top 10 Tracks Table */}
         <div className="card bg-base-100 shadow-xl xl:col-span-2">
@@ -177,15 +306,22 @@ export default function DataExploration() {
             <h3 className="card-title text-2xl mb-4">Song Duration Trend (2000-2024)</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={SONG_DURATION_TREND}>
+                <LineChart data={SONG_DURATION_TREND_MINUTES}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
                   <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
-                  <YAxis fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="s" />
+                  <YAxis
+                    fontSize={11}
+                    tick={{fill: 'var(--foreground)'}}
+                    stroke="var(--border)"
+                    unit="min"
+                    tickFormatter={(value) => Number(value).toFixed(1)}
+                  />
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
                     itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: any) => [formatMinutes(Number(value)), "Avg duration"]}
                   />
-                  <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="avg_duration_min" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -215,38 +351,79 @@ export default function DataExploration() {
           </div>
         </div>
 
-        {/* Top 15 Genres */}
+        {/* Genre Hierarchy */}
         <div className="card bg-base-100 shadow-xl xl:col-span-2">
           <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Top 15 Most Popular Genres</h3>
+            <h3 className="card-title text-2xl mb-4">Genre Hierarchy (Artists &gt; 500)</h3>
             <div className="h-[500px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={TOP_GENRES_DATA} layout="vertical" margin={{ left: 60, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.3} />
-                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" fontSize={11} />
-                  <YAxis dataKey="genre" type="category" fontSize={11} width={120} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'var(--background)', 
-                      borderColor: 'var(--border)', 
-                      borderRadius: '1rem',
-                      color: 'var(--foreground)' 
+                <PieChart>
+                  <Pie
+                    data={GENRE_PIE_DATA}
+                    dataKey="artists"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="45%"
+                    outerRadius="78%"
+                    paddingAngle={1}
+                    labelLine={false}
+                    label={renderGenrePieLabel}
+                    stroke="var(--border)"
+                  >
+                    {GENRE_PIE_DATA.map((entry, index) => (
+                      <Cell key={`genre-slice-${entry.name}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--background)",
+                      borderColor: "var(--border)",
+                      borderRadius: "1rem",
+                      color: "var(--foreground)",
                     }}
-                    itemStyle={{ color: 'var(--foreground)' }}
-                    formatter={(value: any, name: any, props: any) => {
-                      if (name === "Avg Popularity") return [value, name];
-                      return [value, name];
-                    }}
-                    labelFormatter={(label) => {
-                      const item = TOP_GENRES_DATA.find(d => d.genre === label);
-                      return `${label} (${item?.track_count.toLocaleString()} tracks)`;
-                    }}
+                    itemStyle={{ color: "var(--foreground)" }}
+                    formatter={(value: any, name: any) => [`${formatInteger(Number(value))} artists`, String(name)]}
                   />
-                  <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-sm opacity-70 mt-4 text-center">
+              A compact view of the genre landscape (filtered to genres with at least 500 artists). Smaller slices are grouped as “Others”.
+            </p>
+          </div>
+        </div>
+
+        {/* Audio Features */}
+        <div className="card bg-base-100 shadow-xl xl:col-span-2">
+          <div className="card-body">
+            <h3 className="card-title text-2xl mb-4">Mode Distribution by Musical Key</h3>
+            <p className="text-sm opacity-70 -mt-2 mb-4">
+              Spotify audio features include musical key (C–B) and mode (major/minor). This chart shows the percentage of songs in each key split by mode.
+            </p>
+            <div className="h-[420px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={MODE_DISTRIBUTION_BY_KEY} margin={{ left: 16, right: 16, top: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                  <XAxis dataKey="key" tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={12} />
+                  <YAxis tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={12} tickFormatter={(v) => `${v}%`} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--background)",
+                      borderColor: "var(--border)",
+                      borderRadius: "1rem",
+                      color: "var(--foreground)",
+                    }}
+                    itemStyle={{ color: "var(--foreground)" }}
+                    formatter={(value: any, name: any) => [formatPercent(Number(value)), name === "major_pct" ? "Major" : "Minor"]}
+                    labelFormatter={(label) => `Key: ${label}`}
+                  />
+                  <Bar dataKey="minor_pct" stackId="mode" name="Minor" fill="#BFDBFE" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="major_pct" stackId="mode" name="Major" fill="#A7F3D0" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Regional genres like 'sad sierreño' lead in average popularity (min. 5k tracks).</p>
           </div>
         </div>
 

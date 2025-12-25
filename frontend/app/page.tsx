@@ -108,7 +108,6 @@ export default function Home() {
             <ul
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow">
-              <li><button onClick={() => {}}>Blog</button></li>
               <li><a href="#exploration">Data Exploration</a></li>
             </ul>
           </div>
@@ -116,7 +115,6 @@ export default function Home() {
         </div>
         
         <div className="navbar-center hidden lg:flex gap-2">
-          <button className="btn btn-ghost">Blog</button>
           <a href="#exploration" className="btn btn-ghost">Data Exploration</a>
         </div>
 
@@ -160,7 +158,7 @@ export default function Home() {
             <div className="text-center lg:text-left lg:w-1/2 max-w-2xl mx-auto lg:mx-0 mb-8 lg:mb-0">
                 <h1 className="text-5xl font-bold">Discover New Music</h1>
                 <p className="py-6">
-                    Break out of your echo chamber. Generate truly random playlists from a massive database of songs.
+                    Generate truly random playlists from a massive database of 256 million songs.
                 </p>
                 
                 {/* Simplified Controls */}
