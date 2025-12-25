@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Rock_3D } from "next/font/google";
+import { Bangers } from "next/font/google";
 import "./globals.css";
 
-const rock3d = Rock_3D({
-  variable: "--font-rock-3d",
+const bangersFont = Bangers({
   subsets: ["latin"],
   weight: "400",
 });
@@ -20,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="icecream">
-      <body
-        className={`${rock3d.variable} antialiased font-[family-name:var(--font-rock-3d)]`}
-      >
+      <body className={`${bangersFont.className} antialiased`}>
         {children}
       </body>
     </html>

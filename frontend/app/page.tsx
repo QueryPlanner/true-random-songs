@@ -83,7 +83,7 @@ export default function Home() {
 
   // --- Render ---
   return (
-    <div className="min-h-screen bg-base-300 text-base-content font-sans flex flex-col">
+    <div className="min-h-screen bg-base-300 text-base-content flex flex-col">
       
       {/* Navbar */}
       <div className="navbar bg-neutral text-neutral-content shadow-lg z-50 fixed top-0 w-full px-4">
