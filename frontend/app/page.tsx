@@ -128,6 +128,8 @@ export default function Home() {
             shockStrength={5}
             resistance={750}
             returnDuration={1.5}
+            baseColor="#fff9f0"
+            activeColor="#ffb2c1"
           />
         </div>
         <div className="hero-content flex-col lg:flex-row w-full max-w-[1400px] relative z-10 gap-12">
