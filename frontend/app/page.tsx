@@ -163,18 +163,18 @@ export default function Home() {
                 </p>
                 
                 {/* Simplified Controls */}
-                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 bg-base-100 p-4 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
                     <div className="flex flex-col gap-2 shrink-0">
                         <div className="join border-2 border-primary-content/10">
                             <button 
                                 onClick={() => setMode("random")}
-                                className={`join-item btn btn-md ${mode === "random" ? "btn-primary" : "btn-ghost"}`}
+                                className={`join-item btn btn-sm ${mode === "random" ? "btn-primary" : "btn-ghost"}`}
                             >
                                 🎲 True Random
                             </button>
                             <button 
                                 onClick={() => setMode("popular")}
-                                className={`join-item btn btn-md ${mode === "popular" ? "btn-primary" : "btn-ghost"}`}
+                                className={`join-item btn btn-sm ${mode === "popular" ? "btn-primary" : "btn-ghost"}`}
                             >
                                 🔥 Somewhat popular random
                             </button>
@@ -183,7 +183,7 @@ export default function Home() {
 
                     <button
                         onClick={fetchTracks}
-                        className={`btn btn-warning btn-lg px-8 shrink-0 ${loading ? "btn-disabled" : ""}`}
+                        className={`btn btn-warning btn-md px-6 shrink-0 ${loading ? "btn-disabled" : ""}`}
                     >
                         {loading ? (
                             <span className="loading loading-spinner"></span>
