@@ -205,11 +205,16 @@ export default function DataExploration() {
             <div className="h-[500px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={TOP_GENRES_DATA} layout="vertical" margin={{ left: 60, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.5} />
-                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
-                  <YAxis dataKey="genre" type="category" fontSize={12} width={120} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.3} />
+                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" fontSize={11} />
+                  <YAxis dataKey="genre" type="category" fontSize={11} width={120} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                    contentStyle={{ 
+                      backgroundColor: 'var(--background)', 
+                      borderColor: 'var(--border)', 
+                      borderRadius: '1rem',
+                      color: 'var(--foreground)' 
+                    }}
                     itemStyle={{ color: 'var(--foreground)' }}
                   />
                   <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
