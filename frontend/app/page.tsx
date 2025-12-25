@@ -118,7 +118,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section (offset for fixed navbar) */}
-      <div className="hero bg-base-200 pt-16 pb-12 relative overflow-hidden">
+      <div className="hero bg-base-200 min-h-screen relative overflow-hidden pt-16">
         <div className="absolute inset-0 w-full h-full z-0">
           <DotGrid
             dotSize={10}
@@ -130,16 +130,16 @@ export default function Home() {
             returnDuration={1.5}
           />
         </div>
-        <div className="hero-content flex-col w-full max-w-7xl relative z-10">
+        <div className="hero-content flex-col lg:flex-row w-full max-w-[1400px] relative z-10 gap-12">
             {/* Text Content */}
-            <div className="text-center max-w-2xl mb-8">
+            <div className="text-center lg:text-left lg:w-1/2 max-w-2xl mx-auto lg:mx-0 mb-8 lg:mb-0">
                 <h1 className="text-5xl font-bold">Discover New Music</h1>
                 <p className="py-6">
                     Break out of your echo chamber. Generate truly random playlists from a massive database of songs.
                 </p>
                 
                 {/* Simplified Controls */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300">
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
                     <div className="form-control">
                         <label className="label cursor-pointer gap-4 pb-0">
                             <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Somewhat popular random"}</span>
@@ -172,7 +172,7 @@ export default function Home() {
             </div>
 
             {/* Playlist Display */}
-            <div className="w-full flex justify-center items-start">
+            <div className="w-full lg:w-1/2 flex justify-center items-start">
                 {/* Desktop: Mockup Browser */}
                 <div className="hidden md:block w-full max-w-4xl h-[600px]">
                   <div className="mockup-browser border border-base-300 bg-base-200 w-full h-full flex flex-col shadow-2xl">
