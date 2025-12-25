@@ -130,8 +130,8 @@ export default function Home() {
                 {/* Simplified Controls */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300">
                     <div className="form-control">
-                        <label className="label cursor-pointer gap-4">
-                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 Random" : "🔥 Popular"}</span>
+                        <label className="label cursor-pointer gap-4 pb-0">
+                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Some what popular random"}</span>
                             <input
                                 type="checkbox"
                                 className="toggle toggle-accent toggle-lg"
@@ -139,6 +139,11 @@ export default function Home() {
                                 onChange={(e) => setMode(e.target.checked ? "popular" : "random")}
                             />
                         </label>
+                        {mode === "popular" && (
+                          <div className="text-left px-1">
+                            <button className="link link-primary text-xs">read more in blog</button>
+                          </div>
+                        )}
                     </div>
 
                     <button
