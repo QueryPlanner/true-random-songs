@@ -23,7 +23,7 @@ export default function Home() {
 
   // --- State ---
   const [mode, setMode] = useState<"random" | "popular">("random");
-  const [count, setCount] = useState(15);
+  const [count] = useState(15);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,14 +31,11 @@ export default function Home() {
   const fetchTracks = async () => {
     setLoading(true);
     try {
-      // Call our local API
-      const res = await axios.get(`http://localhost:8000/random`, {
-        params: { mode, limit: count }
-      });
-      setTracks(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch tracks from local API.");
+      // Use the correct endpoint /random and parameter limit
+      const response = await axios.get(`http://localhost:8000/random?mode=${mode}&limit=${count}`);
+      setTracks(response.data);
+    } catch (error) {
+      console.error("Error fetching tracks:", error);
     } finally {
       setLoading(false);
     }
@@ -65,8 +62,8 @@ export default function Home() {
     return (
       <div className="h-full overflow-y-auto custom-scrollbar bg-base-100">
         <div className="p-2 space-y-2">
-          {tracks.map((track, i) => (
-            <div key={i} className="bg-base-200 rounded-xl overflow-hidden shadow-sm">
+          {tracks.map((track) => (
+            <div key={track.id} className="bg-base-200 rounded-xl overflow-hidden shadow-sm">
               <iframe
                 title={`Spotify preview: ${track.name}`}
                 style={spotifyEmbedIframeStyle}
@@ -143,7 +140,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300">
                     <div className="form-control">
                         <label className="label cursor-pointer gap-4 pb-0">
-                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Some what popular random"}</span>
+                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Somewhat popular random"}</span>
                             <input
                                 type="checkbox"
                                 className="toggle toggle-accent toggle-lg"

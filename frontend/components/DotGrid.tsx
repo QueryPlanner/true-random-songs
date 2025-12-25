@@ -1,12 +1,11 @@
 'use client';
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { gsap } from 'gsap';
-import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
-gsap.registerPlugin(InertiaPlugin);
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const throttle = (func: (...args: any[]) => void, limit: number) => {
   let lastCall = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function (this: any, ...args: any[]) {
     const now = performance.now();
     if (now - lastCall >= limit) {
@@ -180,7 +179,9 @@ const DotGrid: React.FC<DotGridProps> = ({
     let ro: ResizeObserver | null = null;
     if ('ResizeObserver' in window) {
       ro = new ResizeObserver(buildGrid);
-      wrapperRef.current && ro.observe(wrapperRef.current);
+      if (wrapperRef.current) {
+        ro.observe(wrapperRef.current);
+      }
     } else {
       (window as Window).addEventListener('resize', buildGrid);
     }
@@ -213,19 +214,30 @@ const DotGrid: React.FC<DotGridProps> = ({
       pr.vy = vy;
       pr.speed = speed;
 
-      const rect = canvasRef.current!.getBoundingClientRect();
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
       pr.x = e.clientX - rect.left;
       pr.y = e.clientY - rect.top;
 
+      const proxSq = proximity * proximity;
+
       for (const dot of dotsRef.current) {
-        const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
-        if (speed > speedTrigger && dist < proximity && !dot._inertiaApplied) {
+        const dx = dot.cx - pr.x;
+        const dy = dot.cy - pr.y;
+        const dsq = dx * dx + dy * dy;
+
+        if (speed > speedTrigger && dsq < proxSq && !dot._inertiaApplied) {
           dot._inertiaApplied = true;
           gsap.killTweensOf(dot);
           const pushX = dot.cx - pr.x + vx * 0.005;
           const pushY = dot.cy - pr.y + vy * 0.005;
+          
+          // Replaced InertiaPlugin with simple tween
           gsap.to(dot, {
-            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            xOffset: pushX,
+            yOffset: pushY,
+            duration: 0.5,
+            ease: "power2.out",
             onComplete: () => {
               gsap.to(dot, {
                 xOffset: 0,
@@ -241,19 +253,33 @@ const DotGrid: React.FC<DotGridProps> = ({
     };
 
     const onClick = (e: MouseEvent) => {
-      const rect = canvasRef.current!.getBoundingClientRect();
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
+      
+      const shockSq = shockRadius * shockRadius;
+
       for (const dot of dotsRef.current) {
-        const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
-        if (dist < shockRadius && !dot._inertiaApplied) {
+        const dx = dot.cx - cx;
+        const dy = dot.cy - cy;
+        const dsq = dx * dx + dy * dy;
+
+        if (dsq < shockSq && !dot._inertiaApplied) {
           dot._inertiaApplied = true;
           gsap.killTweensOf(dot);
+          const dist = Math.sqrt(dsq);
           const falloff = Math.max(0, 1 - dist / shockRadius);
           const pushX = (dot.cx - cx) * shockStrength * falloff;
           const pushY = (dot.cy - cy) * shockStrength * falloff;
+          
+          // Replaced InertiaPlugin with simple tween
           gsap.to(dot, {
-            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            xOffset: pushX,
+            yOffset: pushY,
+            duration: 0.5,
+            ease: "power2.out",
             onComplete: () => {
               gsap.to(dot, {
                 xOffset: 0,
