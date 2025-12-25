@@ -36,39 +36,56 @@ const TOP_TRACKS_DATA = [
   { track: "Sailor Song", artists: "Gigi Perez", popularity: 95 }
 ];
 
+// Sampled from 2000 onwards for clarity in the modern era
 const SONG_DURATION_TREND = [
-  { year: "1960", avg_duration_sec: 211.75 }, { year: "1965", avg_duration_sec: 191.06 },
-  { year: "1970", avg_duration_sec: 199.26 }, { year: "1975", avg_duration_sec: 214.56 },
-  { year: "1980", avg_duration_sec: 234.98 }, { year: "1985", avg_duration_sec: 212.34 },
-  { year: "1990", avg_duration_sec: 248.31 }, { year: "1995", avg_duration_sec: 245.11 },
-  { year: "2000", avg_duration_sec: 248.22 }, { year: "2005", avg_duration_sec: 241.75 },
-  { year: "2010", avg_duration_sec: 251.99 }, { year: "2015", avg_duration_sec: 247.75 },
-  { year: "2020", avg_duration_sec: 212.73 }, { year: "2024", avg_duration_sec: 193.83 }
+  { year: "2000", avg_duration_sec: 248.22 }, { year: "2001", avg_duration_sec: 243.06 },
+  { year: "2002", avg_duration_sec: 239.39 }, { year: "2003", avg_duration_sec: 239.71 },
+  { year: "2004", avg_duration_sec: 239.4 }, { year: "2005", avg_duration_sec: 241.75 },
+  { year: "2006", avg_duration_sec: 240.4 }, { year: "2007", avg_duration_sec: 245.25 },
+  { year: "2008", avg_duration_sec: 243.46 }, { year: "2009", avg_duration_sec: 246.81 },
+  { year: "2010", avg_duration_sec: 251.99 }, { year: "2011", avg_duration_sec: 250.73 },
+  { year: "2012", avg_duration_sec: 247.36 }, { year: "2013", avg_duration_sec: 250.74 },
+  { year: "2014", avg_duration_sec: 251.34 }, { year: "2015", avg_duration_sec: 247.75 },
+  { year: "2016", avg_duration_sec: 246.94 }, { year: "2017", avg_duration_sec: 240.06 },
+  { year: "2018", avg_duration_sec: 236.1 }, { year: "2019", avg_duration_sec: 226.14 },
+  { year: "2020", avg_duration_sec: 212.73 }, { year: "2021", avg_duration_sec: 209.44 },
+  { year: "2022", avg_duration_sec: 194.31 }, { year: "2023", avg_duration_sec: 196.39 },
+  { year: "2024", avg_duration_sec: 193.83 }
 ];
 
+// Sampled from 2000 onwards for clarity in the modern era
 const EXPLICIT_CONTENT_TREND = [
-  { year: "1990", explicit_pct: 1.35 }, { year: "1995", explicit_pct: 2.21 },
-  { year: "2000", explicit_pct: 2.45 }, { year: "2005", explicit_pct: 3.02 },
-  { year: "2010", explicit_pct: 4.27 }, { year: "2015", explicit_pct: 5.08 },
-  { year: "2020", explicit_pct: 17.0 }, { year: "2024", explicit_pct: 17.84 }
+  { year: "2000", explicit_pct: 2.45 }, { year: "2001", explicit_pct: 2.94 },
+  { year: "2002", explicit_pct: 2.84 }, { year: "2003", explicit_pct: 3.2 },
+  { year: "2004", explicit_pct: 4.35 }, { year: "2005", explicit_pct: 3.02 },
+  { year: "2006", explicit_pct: 3.55 }, { year: "2007", explicit_pct: 3.47 },
+  { year: "2008", explicit_pct: 3.67 }, { year: "2009", explicit_pct: 3.87 },
+  { year: "2010", explicit_pct: 4.27 }, { year: "2011", explicit_pct: 3.83 },
+  { year: "2012", explicit_pct: 4.16 }, { year: "2013", explicit_pct: 4.08 },
+  { year: "2014", explicit_pct: 4.69 }, { year: "2015", explicit_pct: 5.08 },
+  { year: "2016", explicit_pct: 6.93 }, { year: "2017", explicit_pct: 8.74 },
+  { year: "2018", explicit_pct: 11.9 }, { year: "2019", explicit_pct: 15.03 },
+  { year: "2020", explicit_pct: 17.0 }, { year: "2021", explicit_pct: 18.44 },
+  { year: "2022", explicit_pct: 16.57 }, { year: "2023", explicit_pct: 18.56 },
+  { year: "2024", explicit_pct: 17.84 }
 ];
 
 const TOP_GENRES_DATA = [
-  { genre: "sad sierreño", avg_popularity: 23.53 },
-  { genre: "trap", avg_popularity: 23.15 },
-  { genre: "trap latino", avg_popularity: 21.66 },
-  { genre: "trap funk", avg_popularity: 21.51 },
-  { genre: "electro corridos", avg_popularity: 21.17 },
-  { genre: "rap", avg_popularity: 21.14 },
-  { genre: "k-pop", avg_popularity: 21.01 },
-  { genre: "urbano latino", avg_popularity: 20.92 },
-  { genre: "corridos tumbados", avg_popularity: 20.45 },
-  { genre: "agronejo", avg_popularity: 19.46 },
-  { genre: "reggaeton", avg_popularity: 19.37 },
-  { genre: "pop urbaine", avg_popularity: 19.23 },
-  { genre: "latin pop", avg_popularity: 19.1 },
-  { genre: "latin", avg_popularity: 19.0 },
-  { genre: "argentine trap", avg_popularity: 18.37 }
+  { genre: "sad sierreño", avg_popularity: 23.53, track_count: 25315 },
+  { genre: "trap", avg_popularity: 23.15, track_count: 65298 },
+  { genre: "trap latino", avg_popularity: 21.66, track_count: 44919 },
+  { genre: "trap funk", avg_popularity: 21.51, track_count: 49423 },
+  { genre: "electro corridos", avg_popularity: 21.17, track_count: 24776 },
+  { genre: "rap", avg_popularity: 21.14, track_count: 42569 },
+  { genre: "k-pop", avg_popularity: 21.01, track_count: 57687 },
+  { genre: "urbano latino", avg_popularity: 20.92, track_count: 41247 },
+  { genre: "corridos tumbados", avg_popularity: 20.45, track_count: 44186 },
+  { genre: "agronejo", avg_popularity: 19.46, track_count: 37049 },
+  { genre: "reggaeton", avg_popularity: 19.37, track_count: 89118 },
+  { genre: "pop urbaine", avg_popularity: 19.23, track_count: 65088 },
+  { genre: "latin pop", avg_popularity: 19.1, track_count: 56629 },
+  { genre: "latin", avg_popularity: 19.0, track_count: 36242 },
+  { genre: "argentine trap", avg_popularity: 18.37, track_count: 32801 }
 ];
 
 export default function DataExploration() {
@@ -157,44 +174,44 @@ export default function DataExploration() {
         {/* Song Duration Trend */}
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Song Duration Trend (1960-2024)</h3>
+            <h3 className="card-title text-2xl mb-4">Song Duration Trend (2000-2024)</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={SONG_DURATION_TREND}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'currentColor'}} />
-                  <YAxis fontSize={12} tick={{fill: 'currentColor'}} unit="s" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
+                  <YAxis fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="s" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
                   />
-                  <Line type="monotone" dataKey="avg_duration_sec" stroke="#1DB954" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Average track length has significantly decreased since its peak in the 2010s.</p>
+            <p className="text-sm opacity-70 mt-4 text-center">Average track length peaked around 2010 and has sharply declined since.</p>
           </div>
         </div>
 
         {/* Explicit Content Trend */}
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Explicit Content Trend (1990-2024)</h3>
+            <h3 className="card-title text-2xl mb-4">Explicit Content Trend (2000-2024)</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={EXPLICIT_CONTENT_TREND}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={12} tick={{fill: 'currentColor'}} />
-                  <YAxis fontSize={12} tick={{fill: 'currentColor'}} unit="%" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
+                  <YAxis fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="%" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
                   />
-                  <Area type="monotone" dataKey="explicit_pct" stroke="#1DB954" fill="#1DB954" fillOpacity={0.3} />
+                  <Area type="monotone" dataKey="explicit_pct" stroke="var(--secondary)" fill="var(--secondary)" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Percentage of explicit tracks has seen exponential growth in the last decade.</p>
+            <p className="text-sm opacity-70 mt-4 text-center">The proportion of explicit tracks has grown exponentially in the streaming era.</p>
           </div>
         </div>
 
@@ -205,18 +222,31 @@ export default function DataExploration() {
             <div className="h-[500px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={TOP_GENRES_DATA} layout="vertical" margin={{ left: 60, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.3} />
-                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'currentColor'}} />
-                  <YAxis dataKey="genre" type="category" fontSize={12} width={120} tick={{fill: 'currentColor'}} />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.3} />
+                  <XAxis type="number" domain={[0, 25]} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" fontSize={11} />
+                  <YAxis dataKey="genre" type="category" fontSize={11} width={120} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--fallback-b1,oklch(var(--b1)/1))', borderColor: 'var(--fallback-bc,oklch(var(--bc)/0.2))' }}
-                    itemStyle={{ color: 'var(--fallback-bc,oklch(var(--bc)/1))' }}
+                    contentStyle={{ 
+                      backgroundColor: 'var(--background)', 
+                      borderColor: 'var(--border)', 
+                      borderRadius: '1rem',
+                      color: 'var(--foreground)' 
+                    }}
+                    itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: any, name: any, props: any) => {
+                      if (name === "Avg Popularity") return [value, name];
+                      return [value, name];
+                    }}
+                    labelFormatter={(label) => {
+                      const item = TOP_GENRES_DATA.find(d => d.genre === label);
+                      return `${label} (${item?.track_count.toLocaleString()} tracks)`;
+                    }}
                   />
-                  <Bar dataKey="avg_popularity" fill="#1DB954" radius={[0, 4, 4, 0]} name="Avg Popularity" />
+                  <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Regional genres like 'sad sierreño' currently lead in average track popularity.</p>
+            <p className="text-sm opacity-70 mt-4 text-center">Regional genres like 'sad sierreño' lead in average popularity (min. 5k tracks).</p>
           </div>
         </div>
 

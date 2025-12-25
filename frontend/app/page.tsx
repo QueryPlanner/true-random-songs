@@ -87,12 +87,34 @@ export default function Home() {
     <div className="min-h-screen bg-base-300 text-base-content flex flex-col">
       
       {/* Navbar */}
-      <div className="navbar bg-neutral text-neutral-content shadow-lg z-50 fixed top-0 w-full px-4">
+      <div className="navbar bg-primary text-primary-content shadow-lg z-50 fixed top-0 w-full px-4">
         <div className="navbar-start">
-          <button className="btn btn-ghost text-xl">True Random Spotify</button>
+          <div className="dropdown">
+            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h8m-8 6h16" />
+              </svg>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow">
+              <li><button onClick={() => {}}>Blog</button></li>
+              <li><a href="#exploration">Data Exploration</a></li>
+            </ul>
+          </div>
+          <button className="btn btn-ghost border-2 border-primary-content/20 text-xl">True Random Spotify</button>
         </div>
         
-        <div className="navbar-center flex gap-2">
+        <div className="navbar-center hidden lg:flex gap-2">
           <button className="btn btn-ghost">Blog</button>
           <a href="#exploration" className="btn btn-ghost">Data Exploration</a>
         </div>
@@ -128,6 +150,8 @@ export default function Home() {
             shockStrength={5}
             resistance={750}
             returnDuration={1.5}
+            baseColor="#fff9f0"
+            activeColor="#ffb2c1"
           />
         </div>
         <div className="hero-content flex-col lg:flex-row w-full max-w-[1400px] relative z-10 gap-12">
@@ -139,27 +163,27 @@ export default function Home() {
                 </p>
                 
                 {/* Simplified Controls */}
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 bg-base-100 p-6 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
-                    <div className="form-control">
-                        <label className="label cursor-pointer gap-4 pb-0">
-                            <span className="label-text font-bold text-lg">{mode === "random" ? "🎲 True Random" : "🔥 Somewhat popular random"}</span>
-                            <input
-                                type="checkbox"
-                                className="toggle toggle-accent toggle-lg"
-                                checked={mode === "popular"}
-                                onChange={(e) => setMode(e.target.checked ? "popular" : "random")}
-                            />
-                        </label>
-                        {mode === "popular" && (
-                          <div className="text-left px-1">
-                            <button className="link link-primary text-xs">read more in blog</button>
-                          </div>
-                        )}
+                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 bg-base-100 p-4 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
+                    <div className="flex flex-col gap-2 shrink-0">
+                        <div className="join border-2 border-primary-content/10">
+                            <button 
+                                onClick={() => setMode("random")}
+                                className={`join-item btn btn-sm ${mode === "random" ? "btn-primary" : "btn-ghost"}`}
+                            >
+                                🎲 True Random
+                            </button>
+                            <button 
+                                onClick={() => setMode("popular")}
+                                className={`join-item btn btn-sm ${mode === "popular" ? "btn-primary" : "btn-ghost"}`}
+                            >
+                                🔥 Somewhat popular random
+                            </button>
+                        </div>
                     </div>
 
                     <button
                         onClick={fetchTracks}
-                        className={`btn btn-accent btn-lg px-8 ${loading ? "btn-disabled" : ""}`}
+                        className={`btn btn-warning btn-md px-6 shrink-0 ${loading ? "btn-disabled" : ""}`}
                     >
                         {loading ? (
                             <span className="loading loading-spinner"></span>
