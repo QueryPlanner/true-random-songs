@@ -36,27 +36,8 @@ const TOP_TRACKS_DATA = [
   { track: "Sailor Song", artists: "Gigi Perez", popularity: 95 }
 ];
 
+// Sampled from 2000 onwards for clarity in the modern era
 const SONG_DURATION_TREND = [
-  { year: "1960", avg_duration_sec: 211.75 }, { year: "1961", avg_duration_sec: 222.37 },
-  { year: "1962", avg_duration_sec: 208.59 }, { year: "1963", avg_duration_sec: 206.63 },
-  { year: "1964", avg_duration_sec: 189.2 }, { year: "1965", avg_duration_sec: 191.06 },
-  { year: "1966", avg_duration_sec: 187.78 }, { year: "1967", avg_duration_sec: 194.31 },
-  { year: "1968", avg_duration_sec: 197.99 }, { year: "1969", avg_duration_sec: 213.11 },
-  { year: "1970", avg_duration_sec: 199.26 }, { year: "1971", avg_duration_sec: 225.19 },
-  { year: "1972", avg_duration_sec: 218.68 }, { year: "1973", avg_duration_sec: 221.36 },
-  { year: "1974", avg_duration_sec: 209.7 }, { year: "1975", avg_duration_sec: 214.56 },
-  { year: "1976", avg_duration_sec: 234.37 }, { year: "1977", avg_duration_sec: 267.18 },
-  { year: "1978", avg_duration_sec: 237.71 }, { year: "1979", avg_duration_sec: 222.91 },
-  { year: "1980", avg_duration_sec: 234.98 }, { year: "1981", avg_duration_sec: 254.73 },
-  { year: "1982", avg_duration_sec: 240.02 }, { year: "1983", avg_duration_sec: 233.67 },
-  { year: "1984", avg_duration_sec: 231.01 }, { year: "1985", avg_duration_sec: 212.34 },
-  { year: "1986", avg_duration_sec: 249.04 }, { year: "1987", avg_duration_sec: 249.04 },
-  { year: "1988", avg_duration_sec: 257.49 }, { year: "1989", avg_duration_sec: 246.72 },
-  { year: "1990", avg_duration_sec: 248.31 }, { year: "1991", avg_duration_sec: 251.08 },
-  { year: "1992", avg_duration_sec: 248.02 }, { year: "1993", avg_duration_sec: 250.12 },
-  { year: "1994", avg_duration_sec: 246.77 }, { year: "1995", avg_duration_sec: 245.11 },
-  { year: "1996", avg_duration_sec: 246.25 }, { year: "1997", avg_duration_sec: 245.62 },
-  { year: "1998", avg_duration_sec: 245.65 }, { year: "1999", avg_duration_sec: 246.0 },
   { year: "2000", avg_duration_sec: 248.22 }, { year: "2001", avg_duration_sec: 243.06 },
   { year: "2002", avg_duration_sec: 239.39 }, { year: "2003", avg_duration_sec: 239.71 },
   { year: "2004", avg_duration_sec: 239.4 }, { year: "2005", avg_duration_sec: 241.75 },
@@ -72,12 +53,8 @@ const SONG_DURATION_TREND = [
   { year: "2024", avg_duration_sec: 193.83 }
 ];
 
+// Sampled from 2000 onwards for clarity in the modern era
 const EXPLICIT_CONTENT_TREND = [
-  { year: "1990", explicit_pct: 1.35 }, { year: "1991", explicit_pct: 1.04 },
-  { year: "1992", explicit_pct: 1.87 }, { year: "1993", explicit_pct: 1.68 },
-  { year: "1994", explicit_pct: 2.44 }, { year: "1995", explicit_pct: 2.21 },
-  { year: "1996", explicit_pct: 2.6 }, { year: "1997", explicit_pct: 2.87 },
-  { year: "1998", explicit_pct: 2.5 }, { year: "1999", explicit_pct: 3.05 },
   { year: "2000", explicit_pct: 2.45 }, { year: "2001", explicit_pct: 2.94 },
   { year: "2002", explicit_pct: 2.84 }, { year: "2003", explicit_pct: 3.2 },
   { year: "2004", explicit_pct: 4.35 }, { year: "2005", explicit_pct: 3.02 },
@@ -197,29 +174,29 @@ export default function DataExploration() {
         {/* Song Duration Trend */}
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Song Duration Trend (1960-2024)</h3>
+            <h3 className="card-title text-2xl mb-4">Song Duration Trend (2000-2024)</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={SONG_DURATION_TREND}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={9} />
+                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
                   <YAxis fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="s" />
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
                     itemStyle={{ color: 'var(--foreground)' }}
                   />
-                  <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="avg_duration_sec" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Average track length peaked in the 2010s and has sharply declined since.</p>
+            <p className="text-sm opacity-70 mt-4 text-center">Average track length peaked around 2010 and has sharply declined since.</p>
           </div>
         </div>
 
         {/* Explicit Content Trend */}
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Explicit Content Trend (1990-2024)</h3>
+            <h3 className="card-title text-2xl mb-4">Explicit Content Trend (2000-2024)</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={EXPLICIT_CONTENT_TREND}>
@@ -234,7 +211,7 @@ export default function DataExploration() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">The proportion of explicit tracks has grown exponentially since the mid-2010s.</p>
+            <p className="text-sm opacity-70 mt-4 text-center">The proportion of explicit tracks has grown exponentially in the streaming era.</p>
           </div>
         </div>
 
@@ -256,6 +233,14 @@ export default function DataExploration() {
                       color: 'var(--foreground)' 
                     }}
                     itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: any, name: any, props: any) => {
+                      if (name === "Avg Popularity") return [value, name];
+                      return [value, name];
+                    }}
+                    labelFormatter={(label) => {
+                      const item = TOP_GENRES_DATA.find(d => d.genre === label);
+                      return `${label} (${item?.track_count.toLocaleString()} tracks)`;
+                    }}
                   />
                   <Bar dataKey="avg_popularity" fill="var(--warning)" radius={[0, 4, 4, 0]} name="Avg Popularity" />
                 </BarChart>
