@@ -179,11 +179,9 @@ export default function Home() {
                                 🔥 Somewhat popular random
                             </button>
                         </div>
-                        {mode === "popular" && (
-                          <div className="text-left px-1">
-                            <button className="link link-primary text-xs">read more in blog</button>
-                          </div>
-                        )}
+                        <div className="text-right px-1">
+                          <button className="link link-primary text-xs">read more in blog</button>
+                        </div>
                     </div>
 
                     <button
