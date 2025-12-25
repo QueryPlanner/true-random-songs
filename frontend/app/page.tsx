@@ -202,7 +202,7 @@ export default function Home() {
                 <div className="hidden md:block w-full max-w-4xl h-[600px]">
                   <div className="mockup-browser border border-base-300 bg-base-200 w-full h-full flex flex-col shadow-2xl">
                     <div className="mockup-browser-toolbar">
-                      <div className="input">https://true-random-spotify.com</div>
+                      <div className="input">https://songs-api.lordpatil.com</div>
                     </div>
                     <div className="flex-grow overflow-hidden relative bg-base-100">
                         {renderPlaylistContent()}
