@@ -1,0 +1,32 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: appuser
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/appuser/true-random-songs
+            git pull origin main
+            
+            cd backend
+            # Use uv to sync dependencies
+            /home/appuser/.local/bin/uv sync
+            
+            # Restart the service
+            sudo systemctl restart true-random-songs.service

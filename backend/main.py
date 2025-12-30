@@ -3,6 +3,11 @@ from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional
 import time
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="True Random Spotify API")
 
@@ -48,10 +53,10 @@ def search_yt_id(track_name: str, artist_name: str, album_name: Optional[str] = 
         if album_name:
             query += f" {album_name}"
         results = yt_music.search(query, filter="songs")
-        if results:
-            return results[0]["videoId"]
+        if results and isinstance(results, list) and len(results) > 0:
+            return results[0].get("videoId")
     except Exception as e:
-        print(f"Error searching YT: {e}")
+        logger.error(f"Error searching YT for '{track_name}' by '{artist_name}': {e}")
     return None
 
 @app.get("/random", response_model=List[Track])
@@ -96,23 +101,28 @@ def get_random_tracks(mode: str = Query("random", enum=["random", "popular"]), l
         else:
             raise HTTPException(status_code=400, detail="Invalid mode")
 
-        result = conn.execute(query).fetchall()
+        # Execute and fetch as dictionaries for better maintainability
+        rel = conn.sql(query)
+        columns = rel.columns
+        result = rel.fetchall()
         
         tracks = []
         for i, row in enumerate(result):
-            # row: (id, name, popularity, artist_name, album_name)
+            # Map row to dictionary using column names
+            row_dict = dict(zip(columns, row))
             tracks.append(Track(
                 inx=i,
-                id=row[0],
-                name=row[1],
-                popularity=row[2],
-                artist_name=row[3],
-                album_name=row[4]
+                id=row_dict["id"],
+                name=row_dict["name"],
+                popularity=row_dict["popularity"],
+                artist_name=row_dict.get("artist_name"),
+                album_name=row_dict.get("album_name")
             ))
             
         return tracks
 
     except Exception as e:
+        logger.error(f"Error fetching random tracks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/yt_id")
@@ -124,4 +134,4 @@ def get_yt_id(track_name: str, artist_name: str, album_name: Optional[str] = Non
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8002)

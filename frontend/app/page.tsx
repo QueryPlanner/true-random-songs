@@ -43,7 +43,7 @@ export default function Home() {
     setLoading(true);
     try {
       // Use the correct endpoint /random and parameter limit
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
       const response = await axios.get(`${apiUrl}/random?mode=${mode}&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
@@ -53,33 +53,59 @@ export default function Home() {
     }
   };
 
-  const fetchYtId = async (track: Track) => {
-    if (track.yt_id || ytLoading[track.id]) return;
+  useEffect(() => {
+    if (service !== SERVICES.YOUTUBE) {
+      return;
+    }
 
-    setYtLoading(prev => ({ ...prev, [track.id]: true }));
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await axios.get(`${apiUrl}/yt_id`, {
+    const tracksToFetch = tracks.filter(track => !track.yt_id && !ytLoading[track.id]);
+
+    if (tracksToFetch.length === 0) {
+      return;
+    }
+
+    setYtLoading(prev => {
+      const newYtLoading = { ...prev };
+      tracksToFetch.forEach(track => {
+        newYtLoading[track.id] = true;
+      });
+      return newYtLoading;
+    });
+
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+
+    const fetchPromises = tracksToFetch.map(track =>
+      axios.get(`${apiUrl}/yt_id`, {
         params: {
           track_name: track.name,
           artist_name: track.artist_name || "Unknown Artist",
           album_name: track.album_name,
-        }
-      });
-      
-      setTracks(prev => prev.map(t => t.id === track.id ? { ...t, yt_id: response.data.yt_id } : t));
-    } catch (error) {
-      console.error("Error fetching YT ID:", error);
-    } finally {
-      setYtLoading(prev => ({ ...prev, [track.id]: false }));
-    }
-  };
+        },
+      })
+      .then(response => ({ trackId: track.id, yt_id: response.data.yt_id }))
+      .catch(error => {
+        console.error(`Error fetching YT ID for ${track.name}:`, error);
+        return { trackId: track.id, yt_id: undefined };
+      })
+    );
 
-  useEffect(() => {
-    if (service === SERVICES.YOUTUBE) {
-      const pendingTracks = tracks.filter(track => !track.yt_id);
-      pendingTracks.forEach(track => fetchYtId(track));
-    }
+    Promise.all(fetchPromises).then(results => {
+      const ytIdMap = new Map(results.map(r => [r.trackId, r.yt_id]));
+      
+      setTracks(prevTracks =>
+        prevTracks.map(t =>
+          ytIdMap.has(t.id) ? { ...t, yt_id: ytIdMap.get(t.id) } : t
+        )
+      );
+
+      setYtLoading(prev => {
+        const newYtLoading = { ...prev };
+        tracksToFetch.forEach(track => {
+          newYtLoading[track.id] = false;
+        });
+        return newYtLoading;
+      });
+    });
   }, [service, tracks.length]);
 
   // --- Effects ---
