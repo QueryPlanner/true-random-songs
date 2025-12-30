@@ -295,12 +295,37 @@ const DotGrid: React.FC<DotGridProps> = ({
     };
 
     const throttledMove = throttle(onMove, 50);
+
+    const onTouch = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const touch = e.touches[0];
+      const moveEvent = {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      } as MouseEvent;
+      onMove(moveEvent);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const touch = e.touches[0];
+      const clickEvent = {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      } as MouseEvent;
+      onClick(clickEvent);
+    };
+
     window.addEventListener('mousemove', throttledMove, { passive: true });
     window.addEventListener('click', onClick);
+    window.addEventListener('touchmove', onTouch, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', throttledMove);
       window.removeEventListener('click', onClick);
+      window.removeEventListener('touchmove', onTouch);
+      window.removeEventListener('touchstart', onTouchStart);
     };
   }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
 
