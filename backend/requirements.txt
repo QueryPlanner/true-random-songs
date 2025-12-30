@@ -1,3 +1,5 @@
 duckdb
 fastapi
 uvicorn
+ytmusicapi
+slowapi

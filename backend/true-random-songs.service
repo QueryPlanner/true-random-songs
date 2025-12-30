@@ -1,0 +1,17 @@
+[Unit]
+Description=True Random Songs Backend Service
+After=network.target
+
+[Service]
+User=appuser
+Group=appuser
+WorkingDirectory=/home/appuser/true-random-songs/backend
+# Use uv for execution
+ExecStart=/home/appuser/.local/bin/uv run uvicorn main:app --host 0.0.0.0 --port 8002
+
+# Restart on failure
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

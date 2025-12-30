@@ -11,7 +11,9 @@ interface Track {
   id: string;
   name: string;
   popularity: number;
+  artist_name: string | null;
   album_name: string | null;
+  yt_id?: string;
 }
 
 export default function Home() {
@@ -22,18 +24,26 @@ export default function Home() {
     display: "block",
   };
 
+  // --- Constants ---
+  const SERVICES = {
+    SPOTIFY: "spotify",
+    YOUTUBE: "youtube",
+  } as const;
+
   // --- State ---
   const [mode, setMode] = useState<"random" | "popular">("random");
   const [count] = useState(15);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
+  const [service, setService] = useState<typeof SERVICES[keyof typeof SERVICES]>(SERVICES.SPOTIFY);
+  const [ytLoading, setYtLoading] = useState<Record<string, boolean>>({});
 
   // --- Actions ---
   const fetchTracks = async () => {
     setLoading(true);
     try {
       // Use the correct endpoint /random and parameter limit
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
       const response = await axios.get(`${apiUrl}/random?mode=${mode}&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
@@ -43,6 +53,61 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    if (service !== SERVICES.YOUTUBE) {
+      return;
+    }
+
+    const tracksToFetch = tracks.filter(track => !track.yt_id && !ytLoading[track.id]);
+
+    if (tracksToFetch.length === 0) {
+      return;
+    }
+
+    setYtLoading(prev => {
+      const newYtLoading = { ...prev };
+      tracksToFetch.forEach(track => {
+        newYtLoading[track.id] = true;
+      });
+      return newYtLoading;
+    });
+
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+
+    const fetchPromises = tracksToFetch.map(track =>
+      axios.get(`${apiUrl}/yt_id`, {
+        params: {
+          track_name: track.name,
+          artist_name: track.artist_name || "Unknown Artist",
+          album_name: track.album_name,
+        },
+      })
+      .then(response => ({ trackId: track.id, yt_id: response.data.yt_id }))
+      .catch(error => {
+        console.error(`Error fetching YT ID for ${track.name}:`, error);
+        return { trackId: track.id, yt_id: undefined };
+      })
+    );
+
+    Promise.all(fetchPromises).then(results => {
+      const ytIdMap = new Map(results.map(r => [r.trackId, r.yt_id]));
+      
+      setTracks(prevTracks =>
+        prevTracks.map(t =>
+          ytIdMap.has(t.id) ? { ...t, yt_id: ytIdMap.get(t.id) } : t
+        )
+      );
+
+      setYtLoading(prev => {
+        const newYtLoading = { ...prev };
+        tracksToFetch.forEach(track => {
+          newYtLoading[track.id] = false;
+        });
+        return newYtLoading;
+      });
+    });
+  }, [service, tracks.length]);
+
   // --- Effects ---
   useEffect(() => {
     fetchTracks();
@@ -50,6 +115,8 @@ export default function Home() {
   }, []); // Run once on mount
 
   // --- Render Helpers ---
+  const isValidId = (id: string) => /^[a-zA-Z0-9_-]+$/.test(id);
+
   const renderPlaylistContent = () => {
     if (tracks.length === 0 && !loading) {
       return (
@@ -64,20 +131,54 @@ export default function Home() {
     return (
       <div className="h-full overflow-y-auto custom-scrollbar bg-base-100">
         <div className="p-2 space-y-2">
-          {tracks.map((track) => (
-            <div key={track.id} className="bg-base-200 rounded-xl overflow-hidden shadow-sm">
-              <iframe
-                title={`Spotify preview: ${track.name}`}
-                style={spotifyEmbedIframeStyle}
-                src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
-                width="100%"
-                height="80" // Compact height for mockups
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              ></iframe>
-            </div>
-          ))}
+          {tracks.map((track) => {
+            const isSpotifyIdValid = isValidId(track.id);
+            const isYtIdValid = track.yt_id ? isValidId(track.yt_id) : false;
+
+            return (
+              <div key={track.id} className="bg-base-200 rounded-xl overflow-hidden shadow-sm min-h-[80px]">
+                {service === SERVICES.SPOTIFY ? (
+                  isSpotifyIdValid ? (
+                    <iframe
+                      title={`Spotify preview: ${track.name}`}
+                      style={spotifyEmbedIframeStyle}
+                      src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
+                      width="100%"
+                      height="80"
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    ></iframe>
+                  ) : (
+                    <div className="flex items-center justify-center h-20 text-error text-xs">Invalid Spotify ID</div>
+                  )
+                ) : (
+                  <div className="flex items-center justify-center h-20 bg-black text-white p-2">
+                    {track.yt_id ? (
+                      isYtIdValid ? (
+                        <iframe
+                          title={`YouTube Music: ${track.name}`}
+                          width="100%"
+                          height="80"
+                          src={`https://www.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <div className="text-error text-xs">Invalid YouTube ID</div>
+                      )
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="loading loading-spinner loading-sm text-error"></span>
+                        <span className="text-xs">Searching YouTube Music...</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -111,14 +212,30 @@ export default function Home() {
               <li><a href="#exploration">Data Exploration</a></li>
             </ul>
           </div>
-          <button className="btn btn-ghost border-2 border-primary-content/20 text-xl">True Random Spotify</button>
+          <button className="btn btn-ghost border-2 border-primary-content/20 text-xl">True Random Songs</button>
         </div>
         
         <div className="navbar-center hidden lg:flex gap-2">
           <a href="#exploration" className="btn btn-ghost">Data Exploration</a>
         </div>
 
-        <div className="navbar-end">
+        <div className="navbar-end gap-2">
+          {/* Service Toggle */}
+          <div className="join border border-primary-content/20 bg-primary-focus/50">
+            <button 
+              onClick={() => setService(SERVICES.SPOTIFY)}
+              className={`join-item btn btn-xs ${service === SERVICES.SPOTIFY ? "btn-active" : "btn-ghost"}`}
+            >
+              Spotify
+            </button>
+            <button 
+              onClick={() => setService(SERVICES.YOUTUBE)}
+              className={`join-item btn btn-xs ${service === SERVICES.YOUTUBE ? "btn-active" : "btn-ghost"}`}
+            >
+              YT Music
+            </button>
+          </div>
+
           <a 
             href="https://github.com/QueryPlanner/true-random-songs" 
             target="_blank" 
