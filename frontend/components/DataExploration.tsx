@@ -113,6 +113,19 @@ const GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500: GenrePieSlice[] = [
 ];
 
 export default function DataExploration() {
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [isTinyMobile, setIsTinyMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTinyMobile(window.innerWidth < 480);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat("en-US", { notation: "compact", compactDisplay: "short" }).format(num);
   };
@@ -160,7 +173,7 @@ export default function DataExploration() {
   ] as const;
 
   const buildGenrePieData = (): GenrePieSlice[] => {
-    const majorSlices = GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500.filter((slice) => GENRE_PIE_MAJOR_CATEGORIES.includes(slice.name as any));
+    const majorSlices = GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500.filter((slice) => GENRE_PIE_MAJOR_CATEGORIES.includes(slice.name as typeof GENRE_PIE_MAJOR_CATEGORIES[number]));
     const majorNames = new Set(majorSlices.map((s) => s.name));
 
     const otherCount = GENRE_HIERARCHY_TOP_LEVEL_ARTISTS_GT_500
@@ -192,7 +205,7 @@ export default function DataExploration() {
   const TOTAL_ARTISTS_IN_PIE = GENRE_PIE_DATA.reduce((sum, slice) => sum + slice.artists, 0);
 
   const RADIAN = Math.PI / 180;
-  const renderGenrePieLabel = (labelProps: any) => {
+  const renderGenrePieLabel = (labelProps: { cx: number; cy: number; midAngle: number; innerRadius: number; outerRadius: number; name: string; value: number }) => {
     const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = labelProps;
 
     const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
@@ -201,6 +214,11 @@ export default function DataExploration() {
 
     const percentage = (Number(value) / TOTAL_ARTISTS_IN_PIE) * 100;
     const labelText = `${name} (${formatPercent(percentage)})`;
+    
+    // Using component-level state for responsiveness
+    const fontSize = isTinyMobile ? 0 : (isMobile ? 9 : 11);
+
+    if (fontSize === 0) return null;
 
     return (
       <text
@@ -209,7 +227,7 @@ export default function DataExploration() {
         fill="var(--base-content)"
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
-        fontSize={11}
+        fontSize={fontSize}
         fontWeight={700}
         stroke="color-mix(in oklab, var(--base-100) 85%, transparent)"
         strokeWidth={3}
@@ -236,128 +254,131 @@ export default function DataExploration() {
   ];
 
   return (
-    <div id="exploration" className="w-full max-w-7xl mx-auto p-4 md:p-8 space-y-12 bg-base-200 rounded-3xl my-12">
+    <div id="exploration" className="w-full max-w-7xl mx-auto p-4 md:p-8 space-y-8 md:space-y-12 bg-base-200 rounded-3xl my-12">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h2 className="text-5xl font-bold text-primary">Data Exploration</h2>
-        <p className="text-xl opacity-80 max-w-2xl mx-auto">
+      <div className="text-center space-y-2 md:space-y-4">
+        <h2 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight">Data Exploration</h2>
+        <p className="text-base md:text-xl opacity-80 max-w-2xl mx-auto px-4">
           Deep dive into the Spotify ecosystem. Analysis based on a cleaned dataset of 256M+ tracks.
         </p>
       </div>
 
       {/* General Stats */}
-      <div className="stats stats-vertical lg:stats-horizontal shadow w-full bg-base-100">
-        <div className="stat">
+      <div className="stats stats-vertical lg:stats-horizontal shadow w-full bg-base-100 overflow-hidden">
+        <div className="stat place-items-center lg:place-items-start">
           <div className="stat-title">Total Tracks</div>
-          <div className="stat-value text-primary font-extrabold">{formatNumber(GENERAL_STATS.total_tracks)}</div>
+          <div className="stat-value text-primary text-2xl md:text-3xl lg:text-4xl font-extrabold">{formatNumber(GENERAL_STATS.total_tracks)}</div>
           <div className="stat-desc">256,039,007 unique entries</div>
         </div>
 
-        <div className="stat">
+        <div className="stat place-items-center lg:place-items-start border-t lg:border-t-0">
           <div className="stat-title">Total Artists</div>
-          <div className="stat-value text-base-content font-extrabold">{formatNumber(GENERAL_STATS.total_artists)}</div>
+          <div className="stat-value text-base-content text-2xl md:text-3xl lg:text-4xl font-extrabold">{formatNumber(GENERAL_STATS.total_artists)}</div>
           <div className="stat-desc">15,430,442 creators</div>
         </div>
 
-        <div className="stat">
+        <div className="stat place-items-center lg:place-items-start border-t lg:border-t-0">
           <div className="stat-title">Total Albums</div>
-          <div className="stat-value text-base-content font-extrabold">{formatNumber(GENERAL_STATS.total_albums)}</div>
+          <div className="stat-value text-base-content text-2xl md:text-3xl lg:text-4xl font-extrabold">{formatNumber(GENERAL_STATS.total_albums)}</div>
           <div className="stat-desc">58,590,982 collections</div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
         
-        <div className="xl:col-span-2">{INFO_BLOCK}</div>
+        <div className="xl:col-span-2 px-2 md:px-0">{INFO_BLOCK}</div>
 
         {/* Top 10 Tracks Table */}
-        <div className="card bg-base-100 shadow-xl xl:col-span-2">
-          <div className="card-body overflow-x-auto">
-            <h3 className="card-title text-2xl mb-4">Top 10 Most Popular Tracks</h3>
-            <table className="table table-zebra w-full">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Track</th>
-                  <th>Artists</th>
-                  <th>Popularity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {TOP_TRACKS_DATA.map((track, index) => (
-                  <tr key={index}>
-                    <th>{index + 1}</th>
-                    <td className="font-bold">{track.track}</td>
-                    <td>{track.artists}</td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <progress className="progress progress-primary w-24" value={track.popularity} max="100"></progress>
-                        <span>{track.popularity}</span>
-                      </div>
-                    </td>
+        <div className="card bg-base-100 shadow-xl xl:col-span-2 overflow-hidden">
+          <div className="card-body p-4 md:p-8">
+            <h3 className="card-title text-xl md:text-2xl mb-4">Top 10 Most Popular Tracks</h3>
+            <div className="overflow-x-auto -mx-4 md:mx-0">
+              <table className="table table-sm md:table-md table-zebra w-full min-w-[500px]">
+                <thead>
+                  <tr>
+                    <th className="w-12">Rank</th>
+                    <th>Track</th>
+                    <th>Artists</th>
+                    <th className="w-32">Popularity</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {TOP_TRACKS_DATA.map((track, index) => (
+                    <tr key={index}>
+                      <th className="text-center">{index + 1}</th>
+                      <td className="font-bold max-w-[150px] md:max-w-none truncate">{track.track}</td>
+                      <td className="max-w-[150px] md:max-w-none truncate">{track.artists}</td>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <progress className="progress progress-primary w-12 md:w-24" value={track.popularity} max="100"></progress>
+                          <span className="text-xs md:text-sm">{track.popularity}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         {/* Song Duration Trend */}
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Song Duration Trend (2000-2024)</h3>
-            <div className="h-80 w-full">
+        <div className="card bg-base-100 shadow-xl overflow-hidden">
+          <div className="card-body p-4 md:p-8">
+            <h3 className="card-title text-xl md:text-2xl mb-4">Song Duration Trend</h3>
+            <div className="h-64 md:h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={SONG_DURATION_TREND_MINUTES}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
+                  <XAxis dataKey="year" fontSize={10} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
                   <YAxis
-                    fontSize={11}
+                    fontSize={10}
                     tick={{fill: 'var(--foreground)'}}
                     stroke="var(--border)"
-                    unit="min"
+                    unit="m"
                     tickFormatter={(value) => Number(value).toFixed(1)}
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
                     itemStyle={{ color: 'var(--foreground)' }}
-                    formatter={(value: any) => [formatMinutes(Number(value)), "Avg duration"]}
+                    formatter={(value: number) => [formatMinutes(Number(value)), "Avg duration"]}
                   />
-                  <Line type="monotone" dataKey="avg_duration_min" stroke="var(--primary)" strokeWidth={3} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="avg_duration_min" stroke="var(--primary)" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">Average track length peaked around 2010 and has sharply declined since.</p>
+            <p className="text-xs md:text-sm opacity-70 mt-4 text-center px-4">Track length peaked around 2010 and has declined significantly.</p>
           </div>
         </div>
 
         {/* Explicit Content Trend */}
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Explicit Content Trend (2000-2024)</h3>
-            <div className="h-80 w-full">
+        <div className="card bg-base-100 shadow-xl overflow-hidden">
+          <div className="card-body p-4 md:p-8">
+            <h3 className="card-title text-xl md:text-2xl mb-4">Explicit Content Trend</h3>
+            <div className="h-64 md:h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={EXPLICIT_CONTENT_TREND}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-                  <XAxis dataKey="year" fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
-                  <YAxis fontSize={11} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="%" />
+                  <XAxis dataKey="year" fontSize={10} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" interval={4} />
+                  <YAxis fontSize={10} tick={{fill: 'var(--foreground)'}} stroke="var(--border)" unit="%" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)' }}
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
                     itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: number) => [formatPercent(Number(value)), "Explicit %"]}
                   />
                   <Area type="monotone" dataKey="explicit_pct" stroke="var(--secondary)" fill="var(--secondary)" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">The proportion of explicit tracks has grown exponentially in the streaming era.</p>
+            <p className="text-xs md:text-sm opacity-70 mt-4 text-center px-4">Explicit content has grown exponentially in the streaming era.</p>
           </div>
         </div>
 
         {/* Genre Hierarchy */}
-        <div className="card bg-base-100 shadow-xl xl:col-span-2">
-          <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Genre Hierarchy (Artists &gt; 500)</h3>
-            <div className="h-[500px] w-full">
+        <div className="card bg-base-100 shadow-xl xl:col-span-2 overflow-hidden">
+          <div className="card-body p-4 md:p-8">
+            <h3 className="card-title text-xl md:text-2xl mb-4">Genre Hierarchy</h3>
+            <div className="h-[400px] md:h-[500px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -366,8 +387,8 @@ export default function DataExploration() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius="45%"
-                    outerRadius="78%"
+                    innerRadius={isMobile ? "30%" : "40%"}
+                    outerRadius={isMobile ? "65%" : "75%"}
                     paddingAngle={1}
                     labelLine={false}
                     label={renderGenrePieLabel}
@@ -383,46 +404,48 @@ export default function DataExploration() {
                       borderColor: "var(--border)",
                       borderRadius: "1rem",
                       color: "var(--foreground)",
+                      fontSize: "12px"
                     }}
                     itemStyle={{ color: "var(--foreground)" }}
-                    formatter={(value: any, name: any) => [`${formatInteger(Number(value))} artists`, String(name)]}
+                    formatter={(value: number, name: string) => [`${formatInteger(Number(value))} artists`, String(name)]}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '10px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-sm opacity-70 mt-4 text-center">
-              A compact view of the genre landscape (filtered to genres with at least 500 artists). Smaller slices are grouped as “Others”.
+            <p className="text-xs md:text-sm opacity-70 mt-4 text-center px-4">
+              Genre landscape (minimum 500 artists per genre). Smaller slices are grouped in “Others”.
             </p>
           </div>
         </div>
 
         {/* Audio Features */}
-        <div className="card bg-base-100 shadow-xl xl:col-span-2">
-          <div className="card-body">
-            <h3 className="card-title text-2xl mb-4">Mode Distribution by Musical Key</h3>
-            <p className="text-sm opacity-70 -mt-2 mb-4">
-              Spotify audio features include musical key (C–B) and mode (major/minor). This chart shows the percentage of songs in each key split by mode.
+        <div className="card bg-base-100 shadow-xl xl:col-span-2 overflow-hidden">
+          <div className="card-body p-4 md:p-8">
+            <h3 className="card-title text-xl md:text-2xl mb-4">Mode Distribution by Key</h3>
+            <p className="text-xs md:text-sm opacity-70 -mt-2 mb-4">
+              Percentage of songs in each musical key split by major/minor mode.
             </p>
-            <div className="h-[420px] w-full">
+            <div className="h-[300px] md:h-[420px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={MODE_DISTRIBUTION_BY_KEY} margin={{ left: 16, right: 16, top: 8, bottom: 8 }}>
+                <BarChart data={MODE_DISTRIBUTION_BY_KEY} margin={{ left: -20, right: 0, top: 8, bottom: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-                  <XAxis dataKey="key" tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={12} />
-                  <YAxis tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={12} tickFormatter={(v) => `${v}%`} />
+                  <XAxis dataKey="key" tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={10} />
+                  <YAxis tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={10} tickFormatter={(v) => `${v}%`} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "var(--background)",
                       borderColor: "var(--border)",
                       borderRadius: "1rem",
                       color: "var(--foreground)",
+                      fontSize: "12px"
                     }}
                     itemStyle={{ color: "var(--foreground)" }}
-                    formatter={(value: any, name: any) => [formatPercent(Number(value)), String(name)]}
+                    formatter={(value: number, name: string) => [formatPercent(Number(value)), String(name)]}
                     labelFormatter={(label) => `Key: ${label}`}
                   />
-                  <Bar dataKey="minor_pct" stackId="mode" name="Minor" fill="#BFDBFE" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="major_pct" stackId="mode" name="Major" fill="#A7F3D0" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="minor_pct" stackId="mode" name="Minor" fill="#BFDBFE" />
+                  <Bar dataKey="major_pct" stackId="mode" name="Major" fill="#A7F3D0" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
