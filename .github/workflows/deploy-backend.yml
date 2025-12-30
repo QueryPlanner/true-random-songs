@@ -25,8 +25,8 @@ jobs:
             git pull origin main
             
             cd backend
-            # Use uv to sync dependencies
-            /home/appuser/.local/bin/uv sync
+            # Sync dependencies using uv pip
+            /home/appuser/.local/bin/uv pip install -r requirements.txt
             
             # Restart the service
             sudo systemctl restart true-random-songs.service
