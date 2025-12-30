@@ -79,11 +79,11 @@ def get_random_tracks(request: Request, mode: str = Query("random", enum=["rando
         
         if mode == "random":
             # True random using reservoir sampling (USING SAMPLE)
-            # Use parameterized query to prevent injection
+            # Note: USING SAMPLE currently only supports constants in DuckDB
             query = f"""
                 WITH random_tracks AS (
                     SELECT * FROM '{TRACKS_FILE}'
-                    USING SAMPLE ?
+                    USING SAMPLE {int(limit)}
                 )
                 SELECT 
                     t.id, 
@@ -94,7 +94,7 @@ def get_random_tracks(request: Request, mode: str = Query("random", enum=["rando
                 FROM random_tracks t
                 LEFT JOIN '{ALBUMS_FILE}' a ON t.album_rowid = a.rowid
             """
-            params = (limit,)
+            params = ()
         elif mode == "popular":
             # Somewhat popular: popularity >= 10
             # We use ORDER BY random() as we filter first
