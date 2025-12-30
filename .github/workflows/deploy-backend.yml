@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
   workflow_dispatch:
 
 jobs:
@@ -27,6 +28,10 @@ jobs:
             cd backend
             # Sync dependencies using uv pip
             /home/appuser/.local/bin/uv pip install -r requirements.txt
+            
+            # Update the systemd service file if it changed
+            sudo cp true-random-songs.service /etc/systemd/system/
+            sudo systemctl daemon-reload
             
             # Restart the service
             sudo systemctl restart true-random-songs.service
