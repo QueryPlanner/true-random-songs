@@ -23,7 +23,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 from fastapi.middleware.cors import CORSMiddleware
 
 # Secure CORS: Allow specific origins from environment, fallback to localhost for dev
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8002").split(",")
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,https://random-songs.lordpatil.com,https://songs-api.lordpatil.com").split(",")
 
 app.add_middleware(
     CORSMiddleware,
