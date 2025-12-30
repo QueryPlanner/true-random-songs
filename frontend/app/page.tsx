@@ -157,7 +157,7 @@ export default function Home() {
                     {track.yt_id ? (
                       isYtIdValid ? (
                         <iframe
-                          title={`YouTube Music: ${track.name}`}
+                          title={`YouTube: ${track.name}`}
                           width="100%"
                           height="80"
                           src={`https://www.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
@@ -171,7 +171,7 @@ export default function Home() {
                     ) : (
                       <div className="flex items-center gap-2">
                         <span className="loading loading-spinner loading-sm text-error"></span>
-                        <span className="text-xs">Searching YouTube Music...</span>
+                        <span className="text-xs">Searching YouTube...</span>
                       </div>
                     )}
                   </div>
@@ -232,7 +232,7 @@ export default function Home() {
               onClick={() => setService(SERVICES.YOUTUBE)}
               className={`join-item btn btn-xs md:btn-sm ${service === SERVICES.YOUTUBE ? "btn-active" : "btn-ghost"}`}
             >
-              YT Music
+              YouTube
             </button>
           </div>
 
