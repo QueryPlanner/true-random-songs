@@ -115,6 +115,8 @@ export default function Home() {
   }, []); // Run once on mount
 
   // --- Render Helpers ---
+  const isValidId = (id: string) => /^[a-zA-Z0-9_-]+$/.test(id);
+
   const renderPlaylistContent = () => {
     if (tracks.length === 0 && !loading) {
       return (
@@ -129,41 +131,54 @@ export default function Home() {
     return (
       <div className="h-full overflow-y-auto custom-scrollbar bg-base-100">
         <div className="p-2 space-y-2">
-          {tracks.map((track) => (
-            <div key={track.id} className="bg-base-200 rounded-xl overflow-hidden shadow-sm min-h-[80px]">
-              {service === SERVICES.SPOTIFY ? (
-                <iframe
-                  title={`Spotify preview: ${track.name}`}
-                  style={spotifyEmbedIframeStyle}
-                  src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
-                  width="100%"
-                  height="80" // Compact height for mockups
-                  allowFullScreen
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                ></iframe>
-              ) : (
-                <div className="flex items-center justify-center h-20 bg-black text-white p-2">
-                  {track.yt_id ? (
+          {tracks.map((track) => {
+            const isSpotifyIdValid = isValidId(track.id);
+            const isYtIdValid = track.yt_id ? isValidId(track.yt_id) : false;
+
+            return (
+              <div key={track.id} className="bg-base-200 rounded-xl overflow-hidden shadow-sm min-h-[80px]">
+                {service === SERVICES.SPOTIFY ? (
+                  isSpotifyIdValid ? (
                     <iframe
-                      title={`YouTube Music: ${track.name}`}
+                      title={`Spotify preview: ${track.name}`}
+                      style={spotifyEmbedIframeStyle}
+                      src={`https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`}
                       width="100%"
                       height="80"
-                      src={`https://www.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
                     ></iframe>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="loading loading-spinner loading-sm text-error"></span>
-                      <span className="text-xs">Searching YouTube Music...</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                    <div className="flex items-center justify-center h-20 text-error text-xs">Invalid Spotify ID</div>
+                  )
+                ) : (
+                  <div className="flex items-center justify-center h-20 bg-black text-white p-2">
+                    {track.yt_id ? (
+                      isYtIdValid ? (
+                        <iframe
+                          title={`YouTube Music: ${track.name}`}
+                          width="100%"
+                          height="80"
+                          src={`https://www.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <div className="text-error text-xs">Invalid YouTube ID</div>
+                      )
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="loading loading-spinner loading-sm text-error"></span>
+                        <span className="text-xs">Searching YouTube Music...</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
