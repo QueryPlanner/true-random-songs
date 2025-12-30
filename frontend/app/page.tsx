@@ -31,7 +31,6 @@ export default function Home() {
   } as const;
 
   // --- State ---
-  const [mode, setMode] = useState<"random" | "popular">("random");
   const [count] = useState(15);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +43,7 @@ export default function Home() {
     try {
       // Use the correct endpoint /random and parameter limit
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://songs-api.lordpatil.com";
-      const response = await axios.get(`${apiUrl}/random?mode=${mode}&limit=${count}`);
+      const response = await axios.get(`${apiUrl}/random?mode=random&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
       console.error("Error fetching tracks:", error);
@@ -280,23 +279,6 @@ export default function Home() {
                 
                 {/* Simplified Controls */}
                 <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 bg-base-100/80 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
-                    <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
-                        <div className="join border-2 border-primary-content/10 w-full justify-center">
-                            <button 
-                                onClick={() => setMode("random")}
-                                className={`join-item btn btn-sm flex-1 sm:flex-none ${mode === "random" ? "btn-primary" : "btn-ghost"}`}
-                            >
-                                🎲 True Random
-                            </button>
-                            <button 
-                                onClick={() => setMode("popular")}
-                                className={`join-item btn btn-sm flex-1 sm:flex-none ${mode === "popular" ? "btn-primary" : "btn-ghost"}`}
-                            >
-                                🔥 Popular-ish
-                            </button>
-                        </div>
-                    </div>
-
                     <button
                         onClick={fetchTracks}
                         className={`btn btn-warning btn-md px-8 shrink-0 w-full sm:w-auto ${loading ? "btn-disabled" : ""}`}
