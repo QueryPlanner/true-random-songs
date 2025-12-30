@@ -89,7 +89,6 @@ def get_random_tracks(request: Request, mode: str = Query("random", enum=["rando
                     t.id, 
                     t.name, 
                     t.popularity, 
-                    a.artist_name,
                     a.name as album_name
                 FROM random_tracks t
                 LEFT JOIN '{ALBUMS_FILE}' a ON t.album_rowid = a.rowid
@@ -103,7 +102,6 @@ def get_random_tracks(request: Request, mode: str = Query("random", enum=["rando
                     t.id, 
                     t.name, 
                     t.popularity, 
-                    a.artist_name,
                     a.name as album_name
                 FROM '{TRACKS_FILE}' t
                 LEFT JOIN '{ALBUMS_FILE}' a ON t.album_rowid = a.rowid
@@ -128,7 +126,7 @@ def get_random_tracks(request: Request, mode: str = Query("random", enum=["rando
                 id=row_dict["id"],
                 name=row_dict["name"],
                 popularity=row_dict["popularity"],
-                artist_name=row_dict.get("artist_name"),
+                artist_name="Unknown Artist",
                 album_name=row_dict.get("album_name")
             ))
             
