@@ -42,7 +42,7 @@ export default function Home() {
     setLoading(true);
     try {
       // Use the correct endpoint /random and parameter limit
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://songs-api.lordpatil.com";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
       const response = await axios.get(`${apiUrl}/random?mode=random&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
@@ -71,7 +71,7 @@ export default function Home() {
       return newYtLoading;
     });
 
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://songs-api.lordpatil.com";
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
 
     const fetchPromises = tracksToFetch.map(track =>
       axios.get(`${apiUrl}/yt_id`, {
