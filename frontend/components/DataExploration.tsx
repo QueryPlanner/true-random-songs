@@ -205,7 +205,7 @@ export default function DataExploration() {
   const TOTAL_ARTISTS_IN_PIE = GENRE_PIE_DATA.reduce((sum, slice) => sum + slice.artists, 0);
 
   const RADIAN = Math.PI / 180;
-  const renderGenrePieLabel = (labelProps: { cx: number; cy: number; midAngle: number; innerRadius: number; outerRadius: number; name: string; value: number }) => {
+  const renderGenrePieLabel = (labelProps: any) => {
     const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = labelProps;
 
     const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
@@ -341,7 +341,7 @@ export default function DataExploration() {
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
                     itemStyle={{ color: 'var(--foreground)' }}
-                    formatter={(value: number) => [formatMinutes(Number(value)), "Avg duration"]}
+                    formatter={(value: any) => [formatMinutes(Number(value || 0)), "Avg duration"]}
                   />
                   <Line type="monotone" dataKey="avg_duration_min" stroke="var(--primary)" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 4 }} />
                 </LineChart>
@@ -364,7 +364,7 @@ export default function DataExploration() {
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
                     itemStyle={{ color: 'var(--foreground)' }}
-                    formatter={(value: number) => [formatPercent(Number(value)), "Explicit %"]}
+                    formatter={(value: any) => [formatPercent(Number(value || 0)), "Explicit %"]}
                   />
                   <Area type="monotone" dataKey="explicit_pct" stroke="var(--secondary)" fill="var(--secondary)" fillOpacity={0.3} />
                 </AreaChart>
@@ -398,16 +398,10 @@ export default function DataExploration() {
                       <Cell key={`genre-slice-${entry.name}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--background)",
-                      borderColor: "var(--border)",
-                      borderRadius: "1rem",
-                      color: "var(--foreground)",
-                      fontSize: "12px"
-                    }}
-                    itemStyle={{ color: "var(--foreground)" }}
-                    formatter={(value: number, name: string) => [`${formatInteger(Number(value))} artists`, String(name)]}
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: any, name: any) => [`${formatInteger(Number(value || 0))} artists`, String(name)]}
                   />
                   <Legend wrapperStyle={{ fontSize: '10px' }} />
                 </PieChart>
@@ -432,16 +426,10 @@ export default function DataExploration() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
                   <XAxis dataKey="key" tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={10} />
                   <YAxis tick={{ fill: "var(--foreground)" }} stroke="var(--border)" fontSize={10} tickFormatter={(v) => `${v}%`} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--background)",
-                      borderColor: "var(--border)",
-                      borderRadius: "1rem",
-                      color: "var(--foreground)",
-                      fontSize: "12px"
-                    }}
-                    itemStyle={{ color: "var(--foreground)" }}
-                    formatter={(value: number, name: string) => [formatPercent(Number(value)), String(name)]}
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '1rem', color: 'var(--foreground)', fontSize: '12px' }}
+                    itemStyle={{ color: 'var(--foreground)' }}
+                    formatter={(value: any, name: any) => [formatPercent(Number(value || 0)), String(name)]}
                     labelFormatter={(label) => `Key: ${label}`}
                   />
                   <Bar dataKey="minor_pct" stackId="mode" name="Minor" fill="#BFDBFE" />
