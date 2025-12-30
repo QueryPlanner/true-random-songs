@@ -160,7 +160,7 @@ export default function Home() {
                           title={`YouTube Music: ${track.name}`}
                           width="100%"
                           height="80"
-                          src={`https://www.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
+                          src={`https://music.youtube.com/embed/${track.yt_id}?modestbranding=1&rel=0`}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
