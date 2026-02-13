@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import DotGrid from "@/components/DotGrid";
 import DataExploration from "@/components/DataExploration";
+import SaveToSpotify from "@/components/SaveToSpotify";
+import {
+  hasValidToken,
+  getAccessToken,
+  consumePendingTracks,
+  createPlaylistWithTracks,
+} from "@/lib/spotify";
 
 // --- Types ---
 interface Track {
@@ -36,13 +43,18 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [service, setService] = useState<typeof SERVICES[keyof typeof SERVICES]>(SERVICES.SPOTIFY);
   const [ytLoading, setYtLoading] = useState<Record<string, boolean>>({});
+  const [autoSaveResult, setAutoSaveResult] = useState<{
+    state: "saving" | "success" | "error";
+    playlistUrl?: string;
+    message?: string;
+  } | null>(null);
 
   // --- Actions ---
   const fetchTracks = async () => {
     setLoading(true);
     try {
       // Use the correct endpoint /random and parameter limit
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
       const response = await axios.get(`${apiUrl}/random?mode=random&limit=${count}`);
       setTracks(response.data);
     } catch (error) {
@@ -71,7 +83,7 @@ export default function Home() {
       return newYtLoading;
     });
 
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
 
     const fetchPromises = tracksToFetch.map(track =>
       axios.get(`${apiUrl}/yt_id`, {
@@ -81,16 +93,16 @@ export default function Home() {
           album_name: track.album_name,
         },
       })
-      .then(response => ({ trackId: track.id, yt_id: response.data.yt_id }))
-      .catch(error => {
-        console.error(`Error fetching YT ID for ${track.name}:`, error);
-        return { trackId: track.id, yt_id: undefined };
-      })
+        .then(response => ({ trackId: track.id, yt_id: response.data.yt_id }))
+        .catch(error => {
+          console.error(`Error fetching YT ID for ${track.name}:`, error);
+          return { trackId: track.id, yt_id: undefined };
+        })
     );
 
     Promise.all(fetchPromises).then(results => {
       const ytIdMap = new Map(results.map(r => [r.trackId, r.yt_id]));
-      
+
       setTracks(prevTracks =>
         prevTracks.map(t =>
           ytIdMap.has(t.id) ? { ...t, yt_id: ytIdMap.get(t.id) } : t
@@ -111,6 +123,32 @@ export default function Home() {
   useEffect(() => {
     fetchTracks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
+  // Auto-save pending tracks after returning from Spotify OAuth
+  useEffect(() => {
+    if (!hasValidToken()) return;
+    const pendingTrackIds = consumePendingTracks();
+    if (!pendingTrackIds || pendingTrackIds.length === 0) return;
+
+    const token = getAccessToken();
+    if (!token) return;
+
+    setAutoSaveResult({ state: "saving" });
+    createPlaylistWithTracks(token, pendingTrackIds)
+      .then((result) => {
+        setAutoSaveResult({
+          state: "success",
+          playlistUrl: result.playlistUrl,
+          message: `Created "${result.playlistName}"`,
+        });
+      })
+      .catch((err) => {
+        setAutoSaveResult({
+          state: "error",
+          message: err instanceof Error ? err.message : "Failed to save",
+        });
+      });
   }, []); // Run once on mount
 
   // --- Render Helpers ---
@@ -186,7 +224,7 @@ export default function Home() {
   // --- Render ---
   return (
     <div className="min-h-screen bg-base-300 text-base-content flex flex-col">
-      
+
       {/* Navbar */}
       <div className="navbar bg-primary text-primary-content shadow-lg z-50 fixed top-0 w-full px-2 md:px-4 h-16">
         <div className="navbar-start">
@@ -213,7 +251,7 @@ export default function Home() {
           </div>
           <button className="btn btn-ghost text-lg md:text-xl font-black tracking-tighter px-2">TRS</button>
         </div>
-        
+
         <div className="navbar-center hidden lg:flex gap-2">
           <a href="#exploration" className="btn btn-ghost btn-sm">Data Exploration</a>
         </div>
@@ -221,13 +259,13 @@ export default function Home() {
         <div className="navbar-end gap-1 md:gap-2">
           {/* Service Toggle */}
           <div className="join border border-primary-content/20 bg-primary-focus/50 scale-90 md:scale-100 origin-right">
-            <button 
+            <button
               onClick={() => setService(SERVICES.SPOTIFY)}
               className={`join-item btn btn-xs md:btn-sm ${service === SERVICES.SPOTIFY ? "btn-active" : "btn-ghost"}`}
             >
               Spotify
             </button>
-            <button 
+            <button
               onClick={() => setService(SERVICES.YOUTUBE)}
               className={`join-item btn btn-xs md:btn-sm ${service === SERVICES.YOUTUBE ? "btn-active" : "btn-ghost"}`}
             >
@@ -235,9 +273,9 @@ export default function Home() {
             </button>
           </div>
 
-          <a 
-            href="https://github.com/QueryPlanner/true-random-songs" 
-            target="_blank" 
+          <a
+            href="https://github.com/QueryPlanner/true-random-songs"
+            target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost btn-circle btn-sm md:btn-md"
           >
@@ -270,60 +308,96 @@ export default function Home() {
           />
         </div>
         <div className="hero-content flex-col lg:flex-row w-full max-w-[1400px] relative z-10 gap-8 lg:gap-12 px-4">
-            {/* Text Content */}
-            <div className="text-center lg:text-left lg:w-1/2 max-w-2xl mx-auto lg:mx-0">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">Discover New Music</h1>
-                <p className="py-4 md:py-6 text-lg opacity-90">
-                    Generate truly random playlists from a massive database of 256 million songs.
-                </p>
-                
-                {/* Simplified Controls */}
-                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 bg-base-100/80 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
-                    <button
-                        onClick={fetchTracks}
-                        className={`btn btn-warning btn-md px-8 shrink-0 w-full sm:w-auto ${loading ? "btn-disabled" : ""}`}
-                    >
-                        {loading ? (
-                            <span className="loading loading-spinner"></span>
-                        ) : (
-                            <span className="text-2xl mr-2">🎲</span>
-                        )}
-                        {loading ? "Generating..." : "Generate"}
-                    </button>
-                </div>
+          {/* Text Content */}
+          <div className="text-center lg:text-left lg:w-1/2 max-w-2xl mx-auto lg:mx-0">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">Discover New Music</h1>
+            <p className="py-4 md:py-6 text-lg opacity-90">
+              Generate truly random playlists from a massive database of 256 million songs.
+            </p>
+
+            {/* Simplified Controls */}
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 bg-base-100/80 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-base-300 w-full lg:w-fit mx-auto lg:mx-0">
+              <button
+                onClick={fetchTracks}
+                className={`btn btn-warning btn-md px-8 shrink-0 w-full sm:w-auto ${loading ? "btn-disabled" : ""}`}
+              >
+                {loading ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  <span className="text-2xl mr-2">🎲</span>
+                )}
+                {loading ? "Generating..." : "Generate"}
+              </button>
+
+              {service === SERVICES.SPOTIFY && tracks.length > 0 && (
+                <SaveToSpotify tracks={tracks} />
+              )}
             </div>
 
-            {/* Playlist Display */}
-            <div className="w-full lg:w-1/2 flex justify-center items-start mt-4 lg:mt-0">
-                {/* Desktop: Mockup Browser */}
-                <div className="hidden md:block w-full max-w-4xl h-[600px]">
-                  <div className="mockup-browser border border-base-300 bg-base-200 w-full h-full flex flex-col shadow-2xl">
-                    <div className="mockup-browser-toolbar">
-                      <div className="input text-xs opacity-50">https://songs-api.lordpatil.com</div>
+            {/* Auto-save toast after returning from Spotify OAuth */}
+            {autoSaveResult && (
+              <div className="mt-3 w-full lg:w-fit mx-auto lg:mx-0">
+                {autoSaveResult.state === "saving" && (
+                  <div className="alert alert-info shadow-lg text-sm">
+                    <span className="loading loading-spinner loading-sm"></span>
+                    <span>Creating your Spotify playlist...</span>
+                  </div>
+                )}
+                {autoSaveResult.state === "success" && (
+                  <div className="alert alert-success shadow-lg text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    <div className="flex flex-col">
+                      <span className="font-semibold">{autoSaveResult.message}</span>
+                      {autoSaveResult.playlistUrl && (
+                        <a href={autoSaveResult.playlistUrl} target="_blank" rel="noopener noreferrer" className="link link-hover underline">
+                          Open in Spotify →
+                        </a>
+                      )}
                     </div>
-                    <div className="flex-grow overflow-hidden relative bg-base-100">
-                        {renderPlaylistContent()}
+                    <button onClick={() => setAutoSaveResult(null)} className="btn btn-ghost btn-xs">✕</button>
+                  </div>
+                )}
+                {autoSaveResult.state === "error" && (
+                  <div className="alert alert-error shadow-lg text-sm">
+                    <span>⚠️ {autoSaveResult.message}</span>
+                    <button onClick={() => setAutoSaveResult(null)} className="btn btn-ghost btn-xs">✕</button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Playlist Display */}
+          <div className="w-full lg:w-1/2 flex justify-center items-start mt-4 lg:mt-0">
+            {/* Desktop: Mockup Browser */}
+            <div className="hidden md:block w-full max-w-4xl h-[600px]">
+              <div className="mockup-browser border border-base-300 bg-base-200 w-full h-full flex flex-col shadow-2xl">
+                <div className="mockup-browser-toolbar">
+                  <div className="input text-xs opacity-50">https://songs-api.lordpatil.com</div>
+                </div>
+                <div className="flex-grow overflow-hidden relative bg-base-100">
+                  {renderPlaylistContent()}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile: Mockup Phone */}
+            <div className="md:hidden block w-full flex justify-center">
+              <div className="mockup-phone border-primary shadow-2xl scale-90 sm:scale-100">
+                <div className="mockup-phone-camera"></div>
+                <div className="mockup-phone-display">
+                  <div className="artboard artboard-demo phone-1 bg-base-100 overflow-hidden relative block pt-10 h-full">
+                    <div className="h-full overflow-y-auto">
+                      {renderPlaylistContent()}
                     </div>
                   </div>
                 </div>
-
-                {/* Mobile: Mockup Phone */}
-                <div className="md:hidden block w-full flex justify-center">
-                   <div className="mockup-phone border-primary shadow-2xl scale-90 sm:scale-100">
-                      <div className="mockup-phone-camera"></div> 
-                      <div className="mockup-phone-display">
-                        <div className="artboard artboard-demo phone-1 bg-base-100 overflow-hidden relative block pt-10 h-full">
-                            <div className="h-full overflow-y-auto">
-                                {renderPlaylistContent()}
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                </div>
+              </div>
             </div>
+          </div>
         </div>
       </div>
-      
+
       {/* Data Exploration Section */}
       <DataExploration />
 
